@@ -9,14 +9,23 @@ The goal of the game is to make the other play run into a trail. You lose if you
 
 ## Timeline:
 Week 1
+
 Begin planning for project, including making mockup
+
 Begin working on basic GUI of game
+
 Week 2
+
 Finish basic GUI
+
 Begin writing classes for cars, game board, and trails.
+
 Begin working on event handling/game logic
+
 Week 3
+
 Finish classes
+
 Continue working on event handling
 Start work on gui of main game screen
 Week 4
