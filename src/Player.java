@@ -29,7 +29,7 @@ public class Player {
         this.xPos = 0;
         this.yPos = 0;
         this.direction = 0;
-        this.speed = 5;
+        this.speed = 6;
         this.width = 25;
         this.height = 15;
     }
@@ -119,7 +119,10 @@ public class Player {
     }
 
     public Boolean collison() {
-        if (this.direction == 0 || this.direction == 360) {
+        if (this.xPos > Game.WINDOWWIDTH - 50 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - 70 || this.yPos < 5){
+            return true;
+        }
+        else if (this.direction == 0 || this.direction == 360) {
             if (Game.isEmpty(this.xPos, this.yPos - 1) == false) {
                 return true;
             } else {
@@ -137,16 +140,16 @@ public class Player {
             } else {
                 return false;
             }
-        } else if (this.direction == 270){
+        } else if (this.direction == 270) {
             if (Game.isEmpty(this.xPos - 1, this.yPos) == false) {
                 return true;
             } else {
                 return false;
             }
-        }
-        else{
-            return false;
+        } else{
+                return false;
             }
+
         }
     }
 

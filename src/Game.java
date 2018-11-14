@@ -17,8 +17,8 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     private Graphics doubleBufferGraphics;
 
     // constants for window dimensions
-    static int WINDOWWIDTH = 1280;
-    static int WINDOWHEIGHT = 720;
+    public static int WINDOWWIDTH = 1280;
+    public static int WINDOWHEIGHT = 720;
 
     //sprites
     File audiUpPath = new File("/resources/sprites","Audi_Up.png");
@@ -47,7 +47,7 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     public void init(){
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
-        dt = new Timer(40, this);
+        dt = new Timer(30, this);
 
         roundStart();
     }
@@ -79,7 +79,13 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     }
     public void actionPerformed(ActionEvent e){
 
-        if (player1.collison() == true || player2.collison() == true){
+        if (player1.collison() == true) {
+            System.out.print("Blue player loses");
+            dt.stop();
+            return;
+        }
+        else if (player2.collison() == true){
+            System.out.print("Red Player Loses");
             dt.stop();
             return;
         }
