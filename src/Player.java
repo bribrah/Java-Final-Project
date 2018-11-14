@@ -4,12 +4,17 @@ import javax.swing.ImageIcon;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+
 public class Player {
 
     //position of player on the board
     private int xPos;
     private int yPos;
     private int direction;
+    private Color color;
+    private int width;
+    private int height;
 
     //how fast the car is moving (used for boost)
     private int speed;
@@ -24,17 +29,26 @@ public class Player {
         this.xPos = 0;
         this.yPos = 0;
         this.direction = 0;
-        this.speed = 0;
+        this.speed = 4;
+        this.width = 25;
+        this.height = 15;
     }
 
     public Player(int xpos,int ypos,int direction){
         this.xPos = xpos;
         this.yPos = ypos;
+        this.width = 25;
+        this.height = 15;
         this.direction = direction;
         this.speed = 4;
     }
 
 
+    //////////getters////////
+
+    public int getHeight(){
+        return this.height;
+    }
 
     ///////////Methods////////
 
@@ -44,16 +58,24 @@ public class Player {
      */
     public void turnRight(){
         int direction = this.direction + 90;
-        this.direction = direction % 360;
+        if (direction > 360) {
+            this.direction = direction % 360;
+        }
+        else{
+            this.direction = direction;
+        }
     }
     public void turnLeft(){
         int direction = this.direction - 90;
-        if (direction == 0){
+        if (direction <= 0){
             this.direction = 360;
         }
         else{
             this.direction = direction;
         }
+    }
+    public void setColor(Color color){
+        this.color = color;
     }
 
     //sets player position in arena
@@ -65,18 +87,35 @@ public class Player {
         this.direction = heading;
     }
 
-    public void setSprite(ImageIcon sprite){
-        this.sprite = sprite.getImage();
+
+    public void draw(Graphics2D g){
+        g.setColor(this.color);
+        g.fillRect(this.xPos,this.yPos,this.width,this.height);
     }
 
-//    public void draw(Graphics2D g){
-//        Graphics2D g2d = (Graphics2D) g;
-//        g2d.drawImage(this.sprite,this.xPos,this.yPos,null);
-//    }
-
-    public void draw(Graphics2D g) {
-        g.setColor(Color.blue);
-        g.fillRect(xPos,yPos,40,40);
- }
-
+    public void update(){
+        if (this.direction == 0 || this.direction == 360){
+            this.yPos -= speed;
+            this.height = 25;
+            this.width = 15;
+        }
+        else if (this.direction == 90){
+            this.xPos += speed;
+            this.height = 15;
+            this.width = 25;
+        }
+        else if (this.direction == 180){
+            this.yPos += speed;
+            this.height = 25;
+            this.width = 15;
+        }
+        else if (this.direction == 270){
+            this.xPos -= speed;
+            this.height = 15;
+            this.width = 25;
+        }
+        else{
+            this.xPos += speed;
+        }
+    }
 }

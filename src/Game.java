@@ -1,8 +1,8 @@
-import java.applet.Applet;
-import java.applet.AudioClip;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -17,12 +17,13 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     private Graphics doubleBufferGraphics;
 
     // constants for window dimensions
-    static int WINDOWWIDTH = 1920;
-    static int WINDOWHEIGHT = 1080;
+    static int WINDOWWIDTH = 1280;
+    static int WINDOWHEIGHT = 720;
 
     //sprites
-    ImageIcon audi_up =  new ImageIcon("src/resources/Sprites/Audi_Up");
-    ImageIcon audi_left = new ImageIcon("src/resources/Sprites/Audi_Left");
+    File audiUpPath = new File("/resources/sprites","Audi_Up.png");
+//    BufferedImage audi_up =  ImageIO.read(new File("Audi_Down"));
+    ImageIcon audi_left = new ImageIcon("resources/Sprites/Audi_Left");
 
 
 
@@ -41,17 +42,14 @@ public class Game extends JPanel implements KeyListener, ActionListener{
         gameWindow.addKeyListener(game);
     }
 
+
     //makes doublebuffer so the image does not flicker when it refreshes, shoudl refresh every 15ms
     public void init(){
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
-        dt = new Timer(15, this);
+        dt = new Timer(25, this);
+
         roundStart();
-    }
-    //method that gets called when repaint is called
-    public void paint (Graphics g){
-        draw((Graphics2D) doubleBufferGraphics);
-        g.drawImage(doubleBuffer, 0, 0, this);
     }
     //starts a game, puts players in right spots and such
     public void roundStart(){
@@ -59,26 +57,37 @@ public class Game extends JPanel implements KeyListener, ActionListener{
         repaint();
 
         //sets players initial positions
-        player1.position(WINDOWWIDTH - 200, WINDOWHEIGHT / 2);
+        player1.position(WINDOWWIDTH - 200, (WINDOWHEIGHT / 2) - (player1.getHeight()/2));
         player1.direction(270);
-        player1.setSprite(audi_left);
-        player1.draw();
-        player2.position(200, WINDOWHEIGHT/2);
+        player1.setColor(Color.blue);
+        player2.position(200, WINDOWHEIGHT/2 - (player1.getHeight()/2));
         player2.direction(90);
+        player2.setColor(Color.red);
+    }
+    //method that gets called when repaint is called
+    public void paint (Graphics g){
+        draw((Graphics2D) doubleBufferGraphics);
+        g.drawImage(doubleBuffer, 0, 0, this);
     }
 
     //draws all objects on the game screen
     public void draw(Graphics2D g){
         g.setColor(Color.BLACK);
+        player1.draw(g);
+        player2.draw(g);
 
     }
-
-
     public void actionPerformed(ActionEvent e){
-
-
+        player1.update();
+        player2.update();
         repaint();
     }
+
+
+
+
+
+
     public void keyPressed(KeyEvent k){
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_A){
