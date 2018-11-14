@@ -47,7 +47,7 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     public void init(){
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
-        dt = new Timer(25, this);
+        dt = new Timer(40, this);
 
         roundStart();
     }
@@ -78,9 +78,26 @@ public class Game extends JPanel implements KeyListener, ActionListener{
 
     }
     public void actionPerformed(ActionEvent e){
+
+        if (player1.collison() == true || player2.collison() == true){
+            dt.stop();
+            return;
+        }
         player1.update();
         player2.update();
         repaint();
+    }
+
+    public static boolean isEmpty(int x, int y){
+        BufferedImage arenaGrid = (BufferedImage) doubleBuffer;
+        Color pixelColor = new Color(arenaGrid.getRGB(x,y));
+        if (pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getBlue() == 0 ){
+            return true;
+        }
+        else{
+            return false;
+        }
+
     }
 
 
