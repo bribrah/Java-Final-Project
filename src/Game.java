@@ -13,10 +13,13 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     private Timer dt;
     private static Image doubleBuffer;
     private Graphics doubleBufferGraphics;
-    private int frameDelay = 15;
-    private int frames;
-    private int boost1Hit;
+    private int frames; //holds current frame value
+    private int boost1Hit; //holds the frame value when boost is hit
     private int boost2Hit;
+
+    //CONSTANTS
+    private int FRAMEDELAY = 15;
+    private int BOOSTTIME = 60;
 
     // constants for window dimensions
     public static int WINDOWWIDTH = 1280;
@@ -49,7 +52,7 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     public void init(){
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
-        dt = new Timer(frameDelay, this);
+        dt = new Timer(FRAMEDELAY, this);
 
         roundStart();
     }
@@ -87,7 +90,8 @@ public class Game extends JPanel implements KeyListener, ActionListener{
         frames++;
 
         if (player1.collison() == true) {
-            System.out.print("Blue player loses\n");            dt.stop();
+            System.out.print("Blue player loses\n");
+            dt.stop();
             return;
         }
         else if (player2.collison() == true){
@@ -148,11 +152,11 @@ public class Game extends JPanel implements KeyListener, ActionListener{
             player1.turnRight();
         }
         if (keyCode == KeyEvent.VK_UP) {
-           boost1Hit = this.frames + 50;
+           boost1Hit = this.frames + BOOSTTIME;
            player1.setBoostsLeft(player1.getBoostsLeft() - 1);
         }
         if (keyCode == KeyEvent.VK_W){
-            boost2Hit = this.frames + 50;
+            boost2Hit = this.frames + BOOSTTIME;
             player2.setBoostsLeft(player2.getBoostsLeft() - 1);
         }
 

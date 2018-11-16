@@ -113,7 +113,7 @@ public class Player {
     //speeds up player for a short duration
     public void boost() {
         if (this.boostsLeft + 1 > 0) {
-            this.speed = 5;
+            this.speed = 6;
         }
     }
     public void boostStop(){
