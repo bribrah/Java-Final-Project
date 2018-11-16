@@ -3,8 +3,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class Game extends JPanel implements KeyListener, ActionListener{
@@ -15,6 +13,10 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     private Timer dt;
     private static Image doubleBuffer;
     private Graphics doubleBufferGraphics;
+    private int frameDelay = 15;
+    private int frames;
+    private int boost1Hit;
+    private int boost2Hit;
 
     // constants for window dimensions
     public static int WINDOWWIDTH = 1280;
@@ -47,7 +49,7 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     public void init(){
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
-        dt = new Timer(30, this);
+        dt = new Timer(frameDelay, this);
 
         roundStart();
     }
@@ -57,12 +59,16 @@ public class Game extends JPanel implements KeyListener, ActionListener{
         repaint();
 
         //sets players initial positions
-        player1.position(WINDOWWIDTH - 200, (WINDOWHEIGHT / 2) - (player1.getHeight()/2));
-        player1.direction(270);
+        player1.setPosition(WINDOWWIDTH - 200, (WINDOWHEIGHT / 2) - (player1.getSidelength()/2));
+        player1.setDirection(270);
         player1.setColor(Color.blue);
-        player2.position(200, WINDOWHEIGHT/2 - (player1.getHeight()/2));
-        player2.direction(90);
+        player1.setBoostsLeft(3);
+        boost1Hit = 0;
+        player2.setPosition(200, WINDOWHEIGHT/2 - (player1.getSidelength()/2));
+        player2.setDirection(90);
         player2.setColor(Color.red);
+        player2.setBoostsLeft(3);
+        boost2Hit = 0;
     }
     //method that gets called when repaint is called
     public void paint (Graphics g){
@@ -78,17 +84,33 @@ public class Game extends JPanel implements KeyListener, ActionListener{
 
     }
     public void actionPerformed(ActionEvent e){
+        frames++;
 
         if (player1.collison() == true) {
-            System.out.print("Blue player loses");
-            dt.stop();
+            System.out.print("Blue player loses\n");            dt.stop();
             return;
         }
         else if (player2.collison() == true){
-            System.out.print("Red Player Loses");
+            System.out.print("Red Player Loses\n");
             dt.stop();
             return;
         }
+
+        //sets player boosts to run for approx 50 frames when boost button is hit
+        if (boost1Hit > this.frames){
+            player1.boost();
+        }
+        else{
+            player1.boostStop();
+        }
+        if (boost2Hit > this.frames){
+            player2.boost();
+        }
+        else{
+            player2.boostStop();
+        }
+
+
         player1.update();
         player2.update();
         repaint();
@@ -124,6 +146,14 @@ public class Game extends JPanel implements KeyListener, ActionListener{
         }
         else if (keyCode == KeyEvent.VK_RIGHT){
             player1.turnRight();
+        }
+        if (keyCode == KeyEvent.VK_UP) {
+           boost1Hit = this.frames + 50;
+           player1.setBoostsLeft(player1.getBoostsLeft() - 1);
+        }
+        if (keyCode == KeyEvent.VK_W){
+            boost2Hit = this.frames + 50;
+            player2.setBoostsLeft(player2.getBoostsLeft() - 1);
         }
 
     }
