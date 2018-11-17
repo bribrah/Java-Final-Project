@@ -1,3 +1,15 @@
+# Controls
+
+Enter: starts round
+A:     turns player 1 left
+D:     Turns player 1 Right
+W:     Boosts player 1 speed for short duration
+
+Left Arrow:  Turns player 2 left
+Right Arrow: Turns player 2 right
+Up Arrow:    Boosts player 1 spped for a short duration
+
+
 # Final Project Proposal
 
 My proposal for the final project is to make a snake like game. Snake is a game where the player is a snake. The snake is constantly moving and initially is very small, but as the snake picks up stuff in the game the snake becomes longer. The player loses if you the snake runs into itself or if it runs into the wall. My variant that I hope to make is “snake like” because instead of of a snake that gets longer, it's going to be a car that leaves a constant trail. The game is going to be local multiplayer with 2 players where the player that makes the other player run into their trail wins. Along with this there is going to a boost method that the player can use to give themselves a temporary speed boost.

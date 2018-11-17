@@ -8,7 +8,7 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-@SuppressWarnings({"WeakerAccess", "CanBeFinal"})
+//@  SuppressWarnings({"WeakerAccess", "CanBeFinal"})
 class Game extends JPanel implements KeyListener, ActionListener{
     private Player player2 = new Player();
     private Player player1 = new Player();
@@ -20,15 +20,14 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private int frames; //holds current frame value
     private int boost1Hit; //holds the frame value when boost is hit
     private int boost2Hit;
-    private boolean startButtonHit;
-    //private Timer countDownTimer = new Timer(1000,countDown)
 
     //CONSTANTS
     private int FRAMEDELAY = 15;
     private int BOOSTTIME = 60;
-    public static int WINDOWWIDTH = 800;
-    public static int WINDOWHEIGHT = 600;
+    public static int WINDOWWIDTH = 1000;
+    public static int WINDOWHEIGHT = 800;
     private static String GAMETITLE = "Burnout Battle";
+    private static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
 
     //sprites
     File audiUpPath = new File("/resources/sprites","Audi_Up.png");
@@ -43,14 +42,8 @@ class Game extends JPanel implements KeyListener, ActionListener{
         gameWindow.setBounds(0,0,WINDOWWIDTH,WINDOWHEIGHT);
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameWindow.setResizable(false);
-        JLabel countDownTimer = new JLabel("TEST",JLabel.CENTER);
-//        countDownTimer.setBackground(Color.RED);
-//        countDownTimer.setVisible(true);
-//        countDownTimer.setVerticalAlignment(SwingConstants.BOTTOM);
-
 
         Game game = new Game();
-//        gameWindow.getContentPane().add(countDownTimer);
         gameWindow.getContentPane().add(game);
         gameWindow.setBackground(Color.BLACK);
         gameWindow.setVisible(true);
@@ -91,13 +84,14 @@ class Game extends JPanel implements KeyListener, ActionListener{
         Line2D bottomLine = new Line2D.Float(0,getHeight() - 50,WINDOWWIDTH,getHeight() - 50);
         g.drawImage(doubleBuffer, 0, 0, this);
         ((Graphics2D) doubleBufferGraphics).draw(bottomLine);
-        g.setFont(new Font("TimesRoman", Font.BOLD,20));
+        g.setFont(new Font("Cambria", Font.BOLD,26));
         g.setColor(Color.RED);
-        g.drawString("Player 1 Boosts:" + String.valueOf(player1.getBoostsLeft()),50,WINDOWHEIGHT - 60 );
-        g.drawString(String.valueOf(player1.getScore()), WINDOWWIDTH /2 -50, WINDOWHEIGHT - 60);
+        g.drawString("Player 1 Boosts: " + String.valueOf(player1.getBoostsLeft()),50,BOTTOMTEXTYPOS );
+
+        g.drawString(String.valueOf(player1.getScore()), WINDOWWIDTH /2 -50, BOTTOMTEXTYPOS);
         g.setColor(Color.blue);
-        g.drawString("Player 2 Boosts: " + String.valueOf(player2.getBoostsLeft()), WINDOWWIDTH - 250, WINDOWHEIGHT - 60);
-        g.drawString(String.valueOf(player2.getScore()), WINDOWWIDTH / 2 + 50, WINDOWHEIGHT -60);
+        g.drawString("Player 2 Boosts: " + String.valueOf(player2.getBoostsLeft()), WINDOWWIDTH - 300, BOTTOMTEXTYPOS);
+        g.drawString(String.valueOf(player2.getScore()), WINDOWWIDTH / 2 + 50, BOTTOMTEXTYPOS);
     }
 
     //draws all objects on the game screen
@@ -107,6 +101,8 @@ class Game extends JPanel implements KeyListener, ActionListener{
         player1.draw(g);
 
     }
+
+    //what happens in between each new frame
     public void actionPerformed(ActionEvent e){
         frames++;
 
@@ -141,6 +137,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
         repaint();
     }
 
+    //method to check if a oixel is empty or not
     public static boolean isEmpty(int x, int y){
         BufferedImage arenaGrid = (BufferedImage) doubleBuffer;
         Color pixelColor = new Color(arenaGrid.getRGB(x,y));
@@ -152,7 +149,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
 
 
-
+//game controls
     public void keyPressed(KeyEvent k){
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_A){
@@ -179,11 +176,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
     }
 
     //Start game with enter key and quits with escape key
+    //stops thread for 1.2 seconds in order to prevent lag
+
     public void keyReleased(KeyEvent k){
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_ENTER){
             if(!dt.isRunning()){
-                startButtonHit = true;
 
                 try
                 {
@@ -193,7 +191,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
                 {
                     Thread.currentThread().interrupt();
                 }
-                startButtonHit = false;
                 dt.start();
                 roundStart();
             }
