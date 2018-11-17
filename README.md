@@ -1,12 +1,18 @@
 # Controls
 
 Enter: starts round
+
 A:     turns player 1 left
+
 D:     Turns player 1 Right
+
 W:     Boosts player 1 speed for short duration
 
+
 Left Arrow:  Turns player 2 left
+
 Right Arrow: Turns player 2 right
+
 Up Arrow:    Boosts player 1 spped for a short duration
 
 
