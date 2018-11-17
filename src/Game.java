@@ -1,45 +1,56 @@
-
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import javax.swing.*;
 
-public class Game extends JPanel implements KeyListener, ActionListener{
-    private Player player1 = new Player();
+@SuppressWarnings({"WeakerAccess", "CanBeFinal"})
+class Game extends JPanel implements KeyListener, ActionListener{
     private Player player2 = new Player();
+    private Player player1 = new Player();
 
-    private static String gameTitle = "Burnout Battle";
+
     private Timer dt;
     private static Image doubleBuffer;
     private Graphics doubleBufferGraphics;
     private int frames; //holds current frame value
     private int boost1Hit; //holds the frame value when boost is hit
     private int boost2Hit;
+    private boolean startButtonHit;
+    //private Timer countDownTimer = new Timer(1000,countDown)
 
     //CONSTANTS
     private int FRAMEDELAY = 15;
     private int BOOSTTIME = 60;
-
-    // constants for window dimensions
-    public static int WINDOWWIDTH = 1280;
-    public static int WINDOWHEIGHT = 720;
+    public static int WINDOWWIDTH = 800;
+    public static int WINDOWHEIGHT = 600;
+    private static String GAMETITLE = "Burnout Battle";
 
     //sprites
     File audiUpPath = new File("/resources/sprites","Audi_Up.png");
-//    BufferedImage audi_up =  ImageIO.read(new File("Audi_Down"));
+    //    BufferedImage audi_up =  ImageIO.read(new File("Audi_Down"));
     ImageIcon audi_left = new ImageIcon("resources/Sprites/Audi_Left");
 
 
 
     //makes game window and listens for keystrokes
     public static void main(String[] args){
-        JFrame gameWindow = new JFrame(gameTitle);
+        JFrame gameWindow = new JFrame(GAMETITLE);
         gameWindow.setBounds(0,0,WINDOWWIDTH,WINDOWHEIGHT);
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameWindow.setResizable(false);
+        JLabel countDownTimer = new JLabel("TEST",JLabel.CENTER);
+//        countDownTimer.setBackground(Color.RED);
+//        countDownTimer.setVisible(true);
+//        countDownTimer.setVerticalAlignment(SwingConstants.BOTTOM);
+
 
         Game game = new Game();
+//        gameWindow.getContentPane().add(countDownTimer);
         gameWindow.getContentPane().add(game);
         gameWindow.setBackground(Color.BLACK);
         gameWindow.setVisible(true);
@@ -50,7 +61,7 @@ public class Game extends JPanel implements KeyListener, ActionListener{
 
     //makes doublebuffer so the image does not flicker when it refreshes, shoudl refresh every 15ms
     public void init(){
-        doubleBuffer = createImage(getWidth(),getHeight());
+        doubleBuffer = createImage(getWidth(),getHeight() - 50);
         doubleBufferGraphics = doubleBuffer.getGraphics();
         dt = new Timer(FRAMEDELAY, this);
 
@@ -62,73 +73,78 @@ public class Game extends JPanel implements KeyListener, ActionListener{
         repaint();
 
         //sets players initial positions
-        player1.setPosition(WINDOWWIDTH - 200, (WINDOWHEIGHT / 2) - (player1.getSidelength()/2));
-        player1.setDirection(270);
-        player1.setColor(Color.blue);
-        player1.setBoostsLeft(3);
-        boost1Hit = 0;
-        player2.setPosition(200, WINDOWHEIGHT/2 - (player1.getSidelength()/2));
-        player2.setDirection(90);
-        player2.setColor(Color.red);
+        player2.setPosition(WINDOWWIDTH - 200, ((WINDOWHEIGHT - 50) / 2) - (player2.getSidelength()));
+        player2.setDirection(270);
+        player2.setColor(Color.blue);
         player2.setBoostsLeft(3);
+        boost1Hit = 0;
+        player1.setPosition(200, (WINDOWHEIGHT - 50)/2 - (player2.getSidelength()));
+        player1.setDirection(90);
+        player1.setColor(Color.red);
+        player1.setBoostsLeft(3);
         boost2Hit = 0;
     }
     //method that gets called when repaint is called
     public void paint (Graphics g){
+        super.paint(g);
         draw((Graphics2D) doubleBufferGraphics);
+        Line2D bottomLine = new Line2D.Float(0,getHeight() - 50,WINDOWWIDTH,getHeight() - 50);
         g.drawImage(doubleBuffer, 0, 0, this);
+        ((Graphics2D) doubleBufferGraphics).draw(bottomLine);
+        g.setFont(new Font("TimesRoman", Font.BOLD,20));
+        g.setColor(Color.RED);
+        g.drawString("Player 1 Boosts:" + String.valueOf(player1.getBoostsLeft()),50,WINDOWHEIGHT - 60 );
+        g.drawString(String.valueOf(player1.getScore()), WINDOWWIDTH /2 -50, WINDOWHEIGHT - 60);
+        g.setColor(Color.blue);
+        g.drawString("Player 2 Boosts: " + String.valueOf(player2.getBoostsLeft()), WINDOWWIDTH - 250, WINDOWHEIGHT - 60);
+        g.drawString(String.valueOf(player2.getScore()), WINDOWWIDTH / 2 + 50, WINDOWHEIGHT -60);
     }
 
     //draws all objects on the game screen
     public void draw(Graphics2D g){
         g.setColor(Color.BLACK);
-        player1.draw(g);
         player2.draw(g);
+        player1.draw(g);
 
     }
     public void actionPerformed(ActionEvent e){
         frames++;
 
-        if (player1.collison() == true) {
-            System.out.print("Blue player loses\n");
+        if (player2.collison()) {
+            player1.setScore(player1.getScore() + 1);
             dt.stop();
             return;
         }
-        else if (player2.collison() == true){
-            System.out.print("Red Player Loses\n");
+        else if (player1.collison()){
+            player2.setScore(player2.getScore() + 1);
             dt.stop();
             return;
         }
 
         //sets player boosts to run for approx 50 frames when boost button is hit
         if (boost1Hit > this.frames){
-            player1.boost();
-        }
-        else{
-            player1.boostStop();
-        }
-        if (boost2Hit > this.frames){
             player2.boost();
         }
         else{
             player2.boostStop();
         }
+        if (boost2Hit > this.frames){
+            player1.boost();
+        }
+        else{
+            player1.boostStop();
+        }
 
 
-        player1.update();
         player2.update();
+        player1.update();
         repaint();
     }
 
     public static boolean isEmpty(int x, int y){
         BufferedImage arenaGrid = (BufferedImage) doubleBuffer;
         Color pixelColor = new Color(arenaGrid.getRGB(x,y));
-        if (pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getBlue() == 0 ){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getBlue() == 0;
 
     }
 
@@ -140,24 +156,24 @@ public class Game extends JPanel implements KeyListener, ActionListener{
     public void keyPressed(KeyEvent k){
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_A){
-            player2.turnLeft();
-        }
-        else if (keyCode == KeyEvent.VK_D){
-            player2.turnRight();
-        }
-        else if (keyCode == KeyEvent.VK_LEFT){
             player1.turnLeft();
         }
-        else if (keyCode == KeyEvent.VK_RIGHT){
+        else if (keyCode == KeyEvent.VK_D){
             player1.turnRight();
         }
+        else if (keyCode == KeyEvent.VK_LEFT){
+            player2.turnLeft();
+        }
+        else if (keyCode == KeyEvent.VK_RIGHT){
+            player2.turnRight();
+        }
         if (keyCode == KeyEvent.VK_UP) {
-           boost1Hit = this.frames + BOOSTTIME;
-           player1.setBoostsLeft(player1.getBoostsLeft() - 1);
+            boost1Hit = this.frames + BOOSTTIME;
+            player2.setBoostsLeft(player2.getBoostsLeft() - 1);
         }
         if (keyCode == KeyEvent.VK_W){
             boost2Hit = this.frames + BOOSTTIME;
-            player2.setBoostsLeft(player2.getBoostsLeft() - 1);
+            player1.setBoostsLeft(player1.getBoostsLeft() - 1);
         }
 
     }
@@ -167,6 +183,17 @@ public class Game extends JPanel implements KeyListener, ActionListener{
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_ENTER){
             if(!dt.isRunning()){
+                startButtonHit = true;
+
+                try
+                {
+                    Thread.sleep(1200);
+                }
+                catch(InterruptedException ex)
+                {
+                    Thread.currentThread().interrupt();
+                }
+                startButtonHit = false;
                 dt.start();
                 roundStart();
             }

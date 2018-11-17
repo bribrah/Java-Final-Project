@@ -2,7 +2,7 @@ import java.awt.Color;
 import java.awt.*;
 import java.awt.Graphics2D;
 
-public class Player {
+class Player {
 
     //setPosition of player on the board
     private int xPos;
@@ -13,6 +13,7 @@ public class Player {
     //how fast the car is moving (used for boost)
     private int speed;
     private int boostsLeft;
+    private int score = 0;
 
     //car sprite
     private Image sprite;
@@ -27,13 +28,6 @@ public class Player {
         this.speed = 3;
         this.sideLength = 7;
         this.boostsLeft = 3;
-    }
-    public Player(int direction){
-        this.xPos = 0;
-        this.yPos = 0;
-        this.direction = direction;
-        this.speed = 3;
-        this.sideLength = 7;
     }
 
     //////////getters////////
@@ -91,6 +85,15 @@ public class Player {
     public void setBoostsLeft(int boost){this.boostsLeft = boost;}
 
 
+    //gets score
+    public int getScore(){
+        return this.score;
+    }
+    //sets score
+    public void setScore(int score){
+        this.score = score;
+    }
+
     //draws the player
     public void draw(Graphics2D g) {
         g.setColor(this.color);
@@ -121,40 +124,24 @@ public class Player {
     }
 
     public boolean collison() {
-        if (this.xPos > Game.WINDOWWIDTH - this.sideLength - 20 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 42|| this.yPos < 5){
+        if (this.xPos > Game.WINDOWWIDTH - this.sideLength - 20 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
             return true;
         }
         else if (this.direction == 0 || this.direction == 360) {
-            if (!Game.isEmpty(this.xPos, this.yPos - 1)) {
-                return true;
-            } else {
-                return false;
-            }
+            return !Game.isEmpty(this.xPos, this.yPos - 1);
 
         } else if (this.direction == 90) {
-            if (!Game.isEmpty(this.xPos + this.sideLength + 1, this.yPos)) {
-                return true;
-            } else {
-                return false;
-            }
+            return !Game.isEmpty(this.xPos + this.sideLength + 1, this.yPos);
         } else if (this.direction == 180) {
-            if (!Game.isEmpty(this.xPos, this.yPos + this.sideLength + 1)) {
-                return true;
-            } else {
-                return false;
-            }
+            return !Game.isEmpty(this.xPos, this.yPos + this.sideLength + 1);
         } else if (this.direction == 270) {
-            if (!Game.isEmpty(this.xPos - 1, this.yPos)) {
-                return true;
-            } else {
-                return false;
-            }
+            return !Game.isEmpty(this.xPos - 1, this.yPos);
         }
         else{
-                return false;
-            }
-
+            return false;
         }
+
     }
+}
 
 
