@@ -183,14 +183,13 @@ class Game extends JPanel implements KeyListener, ActionListener{
         if (keyCode == KeyEvent.VK_ENTER){
             if(!dt.isRunning()){
 
-                try
-                {
+                try {
                     Thread.sleep(1200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                catch(InterruptedException ex)
-                {
-                    Thread.currentThread().interrupt();
-                }
+
+
                 dt.start();
                 roundStart();
             }
