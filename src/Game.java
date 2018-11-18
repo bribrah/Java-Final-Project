@@ -64,7 +64,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
         doubleBuffer = createImage(getWidth(),getHeight() - 50);
         doubleBufferGraphics = doubleBuffer.getGraphics();
         try {
-            splashScreen = ImageIO.read(new File("C:\\Users\\bribrah\\IdeaProjects\\Java-Final-Project\\src\\resources\\splash image.png"));
+            splashScreen = ImageIO.read(new File("src/resources/splash image.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,16 +98,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
     public void paint (Graphics g){
         super.paint(g);
         draw((Graphics2D) doubleBufferGraphics);
-        
+
         g.drawImage(doubleBuffer, 0, 0, this);
 
 
         if (gameStarted == true) {
             //sets font and draws the left portion of the bottom info bar
-            Line2D bottomLine = new Line2D.Float(0,getHeight() - 50,WINDOWWIDTH,getHeight() - 50);
-            ((Graphics2D) doubleBufferGraphics).draw(bottomLine);
-
-
             g.setFont(new Font("Cambria", Font.BOLD, 30));
             g.setColor(Color.red);
             g.drawString("Player 1 Boosts: " + String.valueOf(player1.getBoostsLeft()), 50, BOTTOMTEXTYPOS);
