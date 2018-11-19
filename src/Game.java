@@ -26,12 +26,15 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private boolean gameStarted = false;
 
     //CONSTANTS
-    private int FRAMEDELAY = 15;
-    private int BOOSTTIME = 60;
+    int FRAMEDELAY = 15;
+    int BOOSTTIME = 60;
     public static int WINDOWWIDTH = 1000;
     public static int WINDOWHEIGHT = 800;
-    private static String GAMETITLE = "Burnout Battle";
-    private static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
+    static String GAMETITLE = "Burnout Battle";
+    static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
+    static int PLAYERSIZE= 7;
+    static int SPEED = 3;
+    static int BOOSTSPEED = 7;
 
     //sprites
     File audiUpPath = new File("/resources/sprites","Audi_Up.png");
@@ -46,11 +49,10 @@ class Game extends JPanel implements KeyListener, ActionListener{
         gameWindow.setBounds(0,0,WINDOWWIDTH,WINDOWHEIGHT);
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameWindow.setResizable(false);
+        gameWindow.setBackground(Color.black);
 
         Game game = new Game();
-        MainMenu mainMenu = new MainMenu();
         gameWindow.getContentPane().add(game);
-        gameWindow.setBackground(Color.black);
         gameWindow.setVisible(true);
         game.init();
         gameWindow.addKeyListener(game);
@@ -59,10 +61,10 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
     //makes doublebuffer so the image does not flicker when it refreshes, shoudl refresh every 15ms
     public void init(){
-        doubleBuffer = createImage(getWidth(),getHeight() - 50);
+        doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
         try {
-            splashScreen = ImageIO.read(new File("splash image.png"));
+            splashScreen = ImageIO.read(new File("resources/splash image.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,8 +74,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
         //roundStart();
     }
-    //starts a game, puts players in right spots and such
+    //starts a round, puts players in right spots and such
     public void roundStart(){
+        if (gameStarted == false){
+            doubleBuffer = createImage(getWidth(),getHeight() - 50);
+            doubleBufferGraphics = doubleBuffer.getGraphics();
+        }
         gameStarted = true;
         doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
         repaint();
@@ -82,12 +88,14 @@ class Game extends JPanel implements KeyListener, ActionListener{
         player2.setPosition(WINDOWWIDTH - 200, (((WINDOWHEIGHT - 88) / 2) - (player2.getSidelength())));
         player2.setDirection(270);
         player2.setColor(Color.blue);
+        player2.setSideLength(PLAYERSIZE);
         player2.setBoostsLeft(3);
         boost1Hit = 0;
         player1.setPosition(200, (WINDOWHEIGHT - 88)/2 - (player2.getSidelength()));
         player1.setDirection(90);
         player1.setColor(Color.red);
         player1.setBoostsLeft(3);
+        player1.setSideLength(PLAYERSIZE);
         boost2Hit = 0;
         player1Win = false;
         player2Win = false;
@@ -155,16 +163,16 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
         //sets player boosts to run for approx 50 frames when boost button is hit
         if (boost1Hit > this.frames){
-            player2.boost();
+            player2.boost(BOOSTSPEED);
         }
         else{
-            player2.boostStop();
+            player2.boostStop(SPEED);
         }
         if (boost2Hit > this.frames){
-            player1.boost();
+            player1.boost(BOOSTSPEED);
         }
         else{
-            player1.boostStop();
+            player1.boostStop(SPEED);
         }
 
 
@@ -230,7 +238,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
             if(!dt.isRunning()){
 
                 try {
-                    Thread.sleep(1200);
+                    Thread.sleep(1300);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

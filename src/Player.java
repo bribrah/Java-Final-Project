@@ -30,7 +30,7 @@ class Player {
         this.boostsLeft = 3;
     }
 
-    //////////getters////////
+    //////////GETTERS and SETTERS////////
 
     public int getSidelength() {
         return this.sideLength;
@@ -38,12 +38,67 @@ class Player {
 
 
     public void setSideLength(int num){this.sideLength = num;}
+    /**
+     * sets the color of the player and player's trail
+     * @param color A color that the player will be
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    /**
+     * sets players x and y position associated with player
+     * @param x the x pos of player
+     * @param y the y pos of player
+     */
+    public void setPosition(int x, int y) {
+        this.xPos = x;
+        this.yPos = y;
+    }
+
+    /**
+     * Sets direction player is pointing in
+     * @param heading the degree which the plasyer is pointing in
+     */
+    public void setDirection(int heading) {
+        this.direction = heading;
+    }
+
+    /**
+     * gives how many boosts a player has left
+     * @return how many boosts a player has left
+     */
+    public int getBoostsLeft(){return this.boostsLeft;}
+
+    /**
+     * sets how many boost a player can use
+     * @param boost how many boosts the player can use
+     */
+    public void setBoostsLeft(int boost){this.boostsLeft = boost;}
+
+
+    /**
+     * returns player score
+     * @return players score
+     */
+    public int getScore(){
+        return this.score;
+    }
+
+    /**
+     * sets player score
+     * @param score sets players score to integer passed
+     */
+    public void setScore(int score){
+        this.score = score;
+    }
+
     ///////////Methods////////
 
-    /*
-    method to turn the players left or right
-    each time method is called player is turrned 90 degrees
-    also sets the players width and height depending on setDirection
+    /**
+     * method to turn the players left or right
+     * each time method is called player is turrned 90 degrees
+     * also sets the players width and height depending on setDirection
      */
     public void turnRight() {
         int direction = this.direction + 90;
@@ -63,44 +118,20 @@ class Player {
         }
     }
 
-    //sets color of player and players trail
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    //sets player setPosition in arena
-    public void setPosition(int x, int y) {
-        this.xPos = x;
-        this.yPos = y;
-    }
-
-    //sets players setDirection
-    public void setDirection(int heading) {
-        this.direction = heading;
-    }
-
-    //gets boosts left
-    public int getBoostsLeft(){return this.boostsLeft;}
-    //sets boost bar
-    public void setBoostsLeft(int boost){this.boostsLeft = boost;}
-
-
-    //gets score
-    public int getScore(){
-        return this.score;
-    }
-    //sets score
-    public void setScore(int score){
-        this.score = score;
-    }
-
-    //draws the player
+    /**
+     * Draws the player on the graphics2D User Space based on its current color and xpos, ypos, and sidelength
+     * The player is drawn as a square
+     * @param g the user space where the player is to be drawn
+     */
     public void draw(Graphics2D g) {
         g.setColor(this.color);
-        g.fillRect(this.xPos, this.yPos, 7, 7);
+        g.fillRect(this.xPos, this.yPos, this.sideLength, this.sideLength);
     }
 
-    //updates the players setPosition based on its current setDirection
+    /**
+     * updates the players position by changing the x and y positions
+     * the change is based on speed and direction of player
+     */
     public void update() {
         if (this.direction == 0 || this.direction == 360) {
             this.yPos -= speed;
@@ -113,16 +144,30 @@ class Player {
         }
     }
 
-    //speeds up player for a short duration
-    public void boost() {
+    /**
+     * speeds up the player by changing it speed
+     * only does something if the player has at least one boost left
+     * @param boostSpeed the speed that the player will be during the boost
+     */
+    public void boost(int boostSpeed) {
         if (this.boostsLeft > 0) {
-            this.speed = 6;
+            this.speed = boostSpeed;
         }
     }
-    public void boostStop(){
-        this.speed = 3;
+
+    /**
+     * sets speed back to normal value
+     * @param normalSpeed the speed before boost should be passed here
+     */
+    public void boostStop(int normalSpeed){
+        this.speed = normalSpeed;
     }
 
+
+    /**
+     * Detects collison based on what direction player is currently pointed in
+     * @return returns true if collision is detected, returns false if not
+     */
     public boolean collison() {
         if (this.xPos > Game.WINDOWWIDTH - this.sideLength - 20 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
             return true;
