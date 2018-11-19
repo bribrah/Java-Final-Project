@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-//@  SuppressWarnings({"WeakerAccess", "CanBeFinal"})
 class Game extends JPanel implements KeyListener, ActionListener{
     private Player player2 = new Player();
     private Player player1 = new Player();
