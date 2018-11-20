@@ -1,5 +1,7 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,14 +38,25 @@ class Game extends JPanel implements KeyListener, ActionListener{
     static int SPEED = 3;
     static int BOOSTSPEED = 7;
 
+    // SOUNDS
+    private AudioClip crash;
+    private AudioClip backgroundMusic;
+    private AudioClip boostSound1;
+    private AudioClip boostSound2;
+    private AudioClip roundStart;
+
+
     //sprites
-    File audiUpPath = new File("/resources/sprites","Audi_Up.png");
+    //    File audiUpPath = new File("/resources/sprites","Audi_Up.png");
     //    BufferedImage audi_up =  ImageIO.read(new File("Audi_Down"));
-    ImageIcon audi_left = new ImageIcon("resources/Sprites/Audi_Left");
+    //    ImageIcon audi_left = new ImageIcon("resources/Sprites/Audi_Left");
 
 
-
-    //makes game window and listens for keystrokes
+    /**
+     *makes game window and adds keylistener for keystrokes
+     * adds Game to gameWindow
+     * initializes game by calling game.init();
+     */
     public static void main(String[] args){
         JFrame gameWindow = new JFrame(GAMETITLE);
         gameWindow.setBounds(0,0,WINDOWWIDTH,WINDOWHEIGHT);
@@ -53,14 +66,22 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
         Game game = new Game();
         gameWindow.getContentPane().add(game);
+
         gameWindow.setVisible(true);
         game.init();
         gameWindow.addKeyListener(game);
     }
 
 
-    //makes doublebuffer so the image does not flicker when it refreshes, shoudl refresh every 15ms
+    /**
+     * initializes game structures that are needed
+     * makes doublebuffer so the image does not flicker when it refreshes, should refresh every 15ms
+     * draws the splash screen on the screen
+     * initializes all sounds
+     */
     public void init(){
+
+
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
         try {
@@ -69,18 +90,30 @@ class Game extends JPanel implements KeyListener, ActionListener{
             e.printStackTrace();
         }
         doubleBufferGraphics.drawImage(splashScreen,0,0,this);
-        repaint();
-        dt = new Timer(FRAMEDELAY, this);
 
-        //roundStart();
+        //SOUNDS INIT
+        crash = Applet.newAudioClip(getClass().getResource("crash.wav"));
+        backgroundMusic = Applet.newAudioClip(getClass().getResource("backgroundMusic.wav"));
+        boostSound1 = Applet.newAudioClip(getClass().getResource("boostSound.wav"));
+        boostSound2 = Applet.newAudioClip(getClass().getResource("boostSound.wav"));
+        roundStart = Applet.newAudioClip(getClass().getResource("startCountDown.wav"));
+
+
+        dt = new Timer(FRAMEDELAY, this);
+        repaint();
+
     }
-    //starts a round, puts players in right spots and such
+
+    /**
+     *starts a round, puts players in right spots, resets boosts, resets booleans and such
+     * also clears the doubleBufferGraphics so that the old trails get deleted
+     */
     public void roundStart(){
         if (gameStarted == false){
             doubleBuffer = createImage(getWidth(),getHeight() - 50);
             doubleBufferGraphics = doubleBuffer.getGraphics();
+            gameStarted = true;
         }
-        gameStarted = true;
         doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
         repaint();
 
@@ -99,8 +132,17 @@ class Game extends JPanel implements KeyListener, ActionListener{
         boost2Hit = 0;
         player1Win = false;
         player2Win = false;
+
     }
-    //method that gets called when repaint is called
+
+    /**
+     * method that is called when repaint is called
+     * calls draw onto the doubleBufferGraphics to draw players onto it
+     * draws the current doubleBuffer image onto the game portion of the gameWindow
+     * draws the bottom info bar
+     * draws a win message upon a collision
+     * @param g the graphics object that is used to draw onto the doubleBuffer image
+     */
     public void paint (Graphics g){
         super.paint(g);
         draw((Graphics2D) doubleBufferGraphics);
@@ -117,11 +159,11 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
             //changes color and draws right portion of bottom info bar
             g.setColor(Color.blue);
-            g.drawString("Player 2 Boosts: " + String.valueOf(player2.getBoostsLeft()), WINDOWWIDTH - 300, BOTTOMTEXTYPOS);
+            g.drawString("Player 2 Boosts: " + String.valueOf(player2.getBoostsLeft()), WINDOWWIDTH - 350, BOTTOMTEXTYPOS);
             g.drawString(String.valueOf(player2.getScore()), WINDOWWIDTH / 2 + 50, BOTTOMTEXTYPOS);
         }
 
-        //displays which player has one and then stops frames.
+        //displays which player has won and then stops frames.
         if (player1Win == true){
             g.setFont(new Font("Cambria", Font.BOLD, 50));
             g.setColor(Color.white);
@@ -139,7 +181,11 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
     }
 
-    //draws all objects on the game screen
+    /**
+     * method that repaint calls
+     * draws the players
+     * @param g doublebufferGraphics should be passed here after being casted to Graphics2D
+     */
     public void draw(Graphics2D g){
         g.setColor(Color.black);
         player2.draw(g);
@@ -147,19 +193,26 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
     }
 
-    //what happens in between each new frame
+    /**
+     * what happens each frame
+     * detects collision and determines if boost time is up and updates players position
+     * @param e
+     */
     public void actionPerformed(ActionEvent e){
         frames++;
 
         //what happens when a player collides
         if (player2.collison()) {
+            crash.play();
             player1.setScore(player1.getScore() + 1);
             player1Win = true;
         }
         else if (player1.collison()){
+            crash.play();
             player2.setScore(player2.getScore() + 1);
             player2Win = true;
         }
+
 
         //sets player boosts to run for approx 50 frames when boost button is hit
         if (boost1Hit > this.frames){
@@ -167,6 +220,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
         }
         else{
             player2.boostStop(SPEED);
+            boostSound1.stop();
         }
         if (boost2Hit > this.frames){
             player1.boost(BOOSTSPEED);
@@ -181,7 +235,13 @@ class Game extends JPanel implements KeyListener, ActionListener{
         repaint();
     }
 
-    //method to check if a oixel is empty or not
+    /**
+     * method that is called inorder to see if a certain pixel is empty
+     * checks by seeing if the pixel is black
+     * @param x x position on the doubleBuffer image to check
+     * @param y y position on the doubleBuffer image to check
+     * @return true if empty, false if not
+     */
     public static boolean isEmpty(int x, int y){
         BufferedImage arenaGrid = (BufferedImage) doubleBuffer;
         Color pixelColor = new Color(arenaGrid.getRGB(x,y));
@@ -190,10 +250,11 @@ class Game extends JPanel implements KeyListener, ActionListener{
     }
 
 
-
-
-
-//game controls
+    /**
+     * detecs keypresses sent from the keylistener
+     * determines which action to take based on what ley is pressed
+     * @param k sent from keyListener
+     */
     public void keyPressed(KeyEvent k){
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_A){
@@ -209,16 +270,24 @@ class Game extends JPanel implements KeyListener, ActionListener{
             player2.turnRight();
         }
         if (keyCode == KeyEvent.VK_UP) {
+            if (player1.getBoostsLeft() > 0){
+                boostSound1.play();
+            }
             boost1Hit = this.frames + BOOSTTIME;
         }
         if (keyCode == KeyEvent.VK_W){
+            if (player2.getBoostsLeft() > 0){
+                boostSound2.play();
+            }
             boost2Hit = this.frames + BOOSTTIME;
         }
 
     }
 
-    //Start game with enter key and quits with escape key
-    //stops thread for 1.2 seconds in order to prevent lag
+    /**
+     * listens to key release events sent from keyListener and determines correct actions
+     * @param k sent from keyListener
+     */
 
     public void keyReleased(KeyEvent k){
         int keyCode = k.getKeyCode();
@@ -236,9 +305,10 @@ class Game extends JPanel implements KeyListener, ActionListener{
         }
         if (keyCode == KeyEvent.VK_ENTER){
             if(!dt.isRunning()){
+                roundStart.play();
 
                 try {
-                    Thread.sleep(1300);
+                    Thread.sleep(2200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -252,5 +322,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
             System.exit(0);
         }
     }
+
     public void keyTyped(KeyEvent k){}
 }
