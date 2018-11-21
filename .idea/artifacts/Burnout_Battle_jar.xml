@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Burnout_Battle:jar">
+    <output-path>$PROJECT_DIR$</output-path>
+    <root id="archive" name="Final_Project.jar">
+      <element id="module-output" name="Final_Project" />
+    </root>
+  </artifact>
+</component>

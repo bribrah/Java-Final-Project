@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 class Game extends JPanel implements KeyListener, ActionListener{
@@ -24,7 +23,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private int boost2Hit;
     private boolean player1Win;
     private boolean player2Win;
-    private Image splashScreen;
+    private static Image splashScreen;
     private boolean gameStarted = false;
 
     //CONSTANTS
@@ -47,10 +46,20 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
 
     //sprites
-    //    File audiUpPath = new File("/resources/sprites","Audi_Up.png");
-    //    BufferedImage audi_up =  ImageIO.read(new File("Audi_Down"));
-    //    ImageIcon audi_left = new ImageIcon("resources/Sprites/Audi_Left");
+    Image player1Up,player1Right,player1Down,player1Left;
 
+    {
+        try {
+            player1Up = ImageIO.read(getClass().getResource("sprites/Audi_Up.png"));
+            player1Right = ImageIO.read(getClass().getResource("sprites/Audi_Right.png"));
+            player1Down = ImageIO.read(getClass().getResource("sprites/Audi_Down.png"));
+            player1Left = ImageIO.read(getClass().getResource("sprites/Audi_Left.png"));
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      *makes game window and adds keylistener for keystrokes
@@ -70,6 +79,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
         gameWindow.setVisible(true);
         game.init();
         gameWindow.addKeyListener(game);
+
     }
 
 
@@ -85,18 +95,18 @@ class Game extends JPanel implements KeyListener, ActionListener{
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
         try {
-            splashScreen = ImageIO.read(new File("resources/splash image.png"));
+            splashScreen = ImageIO.read(getClass().getResource("splash image.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
         doubleBufferGraphics.drawImage(splashScreen,0,0,this);
 
         //SOUNDS INIT
-        crash = Applet.newAudioClip(getClass().getResource("crash.wav"));
-        backgroundMusic = Applet.newAudioClip(getClass().getResource("backgroundMusic.wav"));
-        boostSound1 = Applet.newAudioClip(getClass().getResource("boostSound.wav"));
-        boostSound2 = Applet.newAudioClip(getClass().getResource("boostSound.wav"));
-        roundStart = Applet.newAudioClip(getClass().getResource("startCountDown.wav"));
+        crash = Applet.newAudioClip(getClass().getResource("Sounds/crash.wav"));
+        backgroundMusic = Applet.newAudioClip(getClass().getResource("Sounds/backgroundMusic.wav"));
+        boostSound1 = Applet.newAudioClip(getClass().getResource("Sounds/boostSound.wav"));
+        boostSound2 = Applet.newAudioClip(getClass().getResource("Sounds/boostSound.wav"));
+        roundStart = Applet.newAudioClip(getClass().getResource("Sounds/startCountDown.wav"));
 
 
         dt = new Timer(FRAMEDELAY, this);
@@ -129,6 +139,11 @@ class Game extends JPanel implements KeyListener, ActionListener{
         player1.setColor(Color.red);
         player1.setBoostsLeft(3);
         player1.setSideLength(PLAYERSIZE);
+        try {
+            player1.setSprite(ImageIO.read(getClass().getResource("sprites/Audi_Left.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         boost2Hit = 0;
         player1Win = false;
         player2Win = false;
@@ -198,7 +213,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
      * detects collision and determines if boost time is up and updates players position
      * @param e
      */
-    public void actionPerformed(ActionEvent e){
+    public void actionPerformed(ActionEvent e) {
         frames++;
 
         //what happens when a player collides
@@ -206,8 +221,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
             crash.play();
             player1.setScore(player1.getScore() + 1);
             player1Win = true;
-        }
-        else if (player1.collison()){
+        } else if (player1.collison()) {
             crash.play();
             player2.setScore(player2.getScore() + 1);
             player2Win = true;
@@ -215,24 +229,34 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
 
         //sets player boosts to run for approx 50 frames when boost button is hit
-        if (boost1Hit > this.frames){
+        if (boost1Hit > this.frames) {
             player2.boost(BOOSTSPEED);
-        }
-        else{
+        } else {
             player2.boostStop(SPEED);
             boostSound1.stop();
         }
-        if (boost2Hit > this.frames){
+        if (boost2Hit > this.frames) {
             player1.boost(BOOSTSPEED);
-        }
-        else{
+        } else {
             player1.boostStop(SPEED);
         }
 
-
-        player2.update();
-        player1.update();
-        repaint();
+        //changes players sprites based on direction
+        if (player1.getDirection() == 0 || player1.getDirection() == 360) {
+            player1.setSprite(player1Up);
+        }
+        else if (player1.getDirection() == 90){
+            player1.setSprite(player1Right);
+        }
+        else if (player1.getDirection() == 180){
+            player1.setSprite((player1Down));
+        }
+        else if (player1.getDirection() == 270){
+            player1.setSprite((player1Left));
+        }
+            player2.update();
+            player1.update();
+            repaint();
     }
 
     /**
@@ -270,13 +294,13 @@ class Game extends JPanel implements KeyListener, ActionListener{
             player2.turnRight();
         }
         if (keyCode == KeyEvent.VK_UP) {
-            if (player1.getBoostsLeft() > 0){
+            if (player1.getBoostsLeft() > 0 && !player1Win && !player2Win &&gameStarted){
                 boostSound1.play();
             }
             boost1Hit = this.frames + BOOSTTIME;
         }
         if (keyCode == KeyEvent.VK_W){
-            if (player2.getBoostsLeft() > 0){
+            if (player2.getBoostsLeft() > 0 && !player1Win && !player2Win &&gameStarted){
                 boostSound2.play();
             }
             boost2Hit = this.frames + BOOSTTIME;
@@ -308,7 +332,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
                 roundStart.play();
 
                 try {
-                    Thread.sleep(2200);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -32,6 +32,18 @@ class Player {
 
     //////////GETTERS and SETTERS////////
 
+    /**
+     * sets players sprite
+     * @param sprite image of sprite that the player will now bw associated with
+     */
+    public void setSprite(Image sprite){
+        this.sprite = sprite;
+    }
+
+    /**
+     * gives the players sideLength
+     * @return the pixel count of the players sideLength
+     */
     public int getSidelength() {
         return this.sideLength;
     }
@@ -64,6 +76,13 @@ class Player {
         this.direction = heading;
     }
 
+    /**
+     * returns players direction angle
+     * @return andle that the player is currently directed at
+     */
+    public int getDirection(){
+        return this.direction;
+    }
     /**
      * gives how many boosts a player has left
      * @return how many boosts a player has left
@@ -102,6 +121,7 @@ class Player {
      */
     public void turnRight() {
         int direction = this.direction + 90;
+        this.sprite = this.sprite;
         if (direction > 360) {
             this.direction = direction % 360;
         } else {
@@ -126,6 +146,7 @@ class Player {
     public void draw(Graphics2D g) {
         g.setColor(this.color);
         g.fillRect(this.xPos, this.yPos, this.sideLength, this.sideLength);
+        //g.drawImage(this.sprite,this.xPos,this.yPos,null);
     }
 
     /**
