@@ -190,7 +190,7 @@ class Player {
      * @return returns true if collision is detected, returns false if not
      */
     public boolean collison() {
-        if (this.xPos > Game.WINDOWWIDTH - this.sideLength -10 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
+        if (this.xPos > Game.WINDOWWIDTH - this.sideLength -15 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
             return true;
         }
         else if (this.direction == 0 || this.direction == 360) {

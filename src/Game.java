@@ -1,4 +1,5 @@
 import javax.imageio.ImageIO;
+import javax.sound.midi.SysexMessage;
 import javax.swing.*;
 import java.applet.Applet;
 import java.applet.AudioClip;
@@ -39,7 +40,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
     // SOUNDS
     private AudioClip crash;
-    private AudioClip backgroundMusic;
+    private AudioClip music;
     private AudioClip boostSound1;
     private AudioClip boostSound2;
     private AudioClip roundStart;
@@ -102,8 +103,8 @@ class Game extends JPanel implements KeyListener, ActionListener{
         doubleBufferGraphics.drawImage(splashScreen,0,0,this);
 
         //SOUNDS INIT
+        //music = Applet.newAudioClip(getClass().getResource("Sounds/test2.wav"));
         crash = Applet.newAudioClip(getClass().getResource("Sounds/crash.wav"));
-        backgroundMusic = Applet.newAudioClip(getClass().getResource("Sounds/backgroundMusic.wav"));
         boostSound1 = Applet.newAudioClip(getClass().getResource("Sounds/boostSound.wav"));
         boostSound2 = Applet.newAudioClip(getClass().getResource("Sounds/boostSound.wav"));
         roundStart = Applet.newAudioClip(getClass().getResource("Sounds/startCountDown.wav"));
@@ -123,6 +124,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
             doubleBuffer = createImage(getWidth(),getHeight() - 50);
             doubleBufferGraphics = doubleBuffer.getGraphics();
             gameStarted = true;
+
         }
         doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
         repaint();
@@ -139,14 +141,15 @@ class Game extends JPanel implements KeyListener, ActionListener{
         player1.setColor(Color.red);
         player1.setBoostsLeft(3);
         player1.setSideLength(PLAYERSIZE);
-        try {
-            player1.setSprite(ImageIO.read(getClass().getResource("sprites/Audi_Left.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            player1.setSprite(ImageIO.read(getClass().getResource("sprites/Audi_Left.png")));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         boost2Hit = 0;
         player1Win = false;
         player2Win = false;
+
 
     }
 
@@ -210,7 +213,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
     /**
      * what happens each frame
-     * detects collision and determines if boost time is up and updates players position
+     * detects collision, determines if boost time is up and updates players position
      * @param e
      */
     public void actionPerformed(ActionEvent e) {
@@ -329,8 +332,8 @@ class Game extends JPanel implements KeyListener, ActionListener{
         }
         if (keyCode == KeyEvent.VK_ENTER){
             if(!dt.isRunning()){
+                //music.play();
                 roundStart.play();
-
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
