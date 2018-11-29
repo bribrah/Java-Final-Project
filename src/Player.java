@@ -12,6 +12,7 @@ class Player {
     private int sideLength;
     //how fast the car is moving (used for boost)
     private int speed;
+    private int boostSpeed;
     private int boostsLeft;
     private int score = 0;
 
@@ -112,6 +113,15 @@ class Player {
         this.score = score;
     }
 
+    public void setSpeed(int speed){
+        this.speed = speed;
+    }
+
+    public int getSpeed(){
+        return this.speed;
+    }
+
+
     ///////////Methods////////
 
     /**
@@ -190,7 +200,7 @@ class Player {
      * @return returns true if collision is detected, returns false if not
      */
     public boolean collison() {
-        if (this.xPos > Game.WINDOWWIDTH - this.sideLength -15 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
+        if (this.xPos > Game.WINDOWWIDTH - this.sideLength - 20 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
             return true;
         }
         else if (this.direction == 0 || this.direction == 360) {

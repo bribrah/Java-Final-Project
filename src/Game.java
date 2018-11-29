@@ -1,13 +1,9 @@
 import javax.imageio.ImageIO;
-import javax.sound.midi.SysexMessage;
 import javax.swing.*;
 import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -34,9 +30,11 @@ class Game extends JPanel implements KeyListener, ActionListener{
     public static int WINDOWHEIGHT = 800;
     static String GAMETITLE = "Burnout Battle";
     static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
-    static int PLAYERSIZE= 7;
-    static int SPEED = 3;
-    static int BOOSTSPEED = 7;
+    static int playersizeSetting = 7;
+    int speedSetting = 3;
+    int settingsSelection = 0;
+    int boostNumberSettings = 3;
+    static int boostSpeedSettings = 7;
 
     // SOUNDS
     private AudioClip crash;
@@ -78,21 +76,21 @@ class Game extends JPanel implements KeyListener, ActionListener{
         gameWindow.getContentPane().add(game);
 
         gameWindow.setVisible(true);
-        game.init();
         gameWindow.addKeyListener(game);
+        game.init();
+
 
     }
 
 
+
     /**
      * initializes game structures that are needed
-     * makes doublebuffer so the image does not flicker when it refreshes, should refresh every 15ms
+     * makes doublebuffer so the image does not flicker when it refreshes and so the trails do not go away
      * draws the splash screen on the screen
      * initializes all sounds
      */
-    public void init(){
-
-
+    public void init(){ ;
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
         try {
@@ -114,6 +112,31 @@ class Game extends JPanel implements KeyListener, ActionListener{
         repaint();
 
     }
+    public void settings(){
+        doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
+        doubleBufferGraphics.setColor(Color.red);
+        doubleBufferGraphics.setFont(new Font("Cambria", Font.BOLD, 60));
+        doubleBufferGraphics.drawString("SETTINGS",getWidth()/2 -130 ,85);
+        doubleBufferGraphics.setFont(new Font("Times",Font.PLAIN,30));
+
+        if (settingsSelection == 0) {
+            doubleBufferGraphics.fillOval(30, 130, 25, 25);
+        }
+        else if(settingsSelection == 1){
+            doubleBufferGraphics.fillOval(30, 230, 25, 25);
+        }
+        else if(settingsSelection == 2){
+            doubleBufferGraphics.fillOval(30, 330, 25, 25);
+        }
+        else if (settingsSelection == 3){
+            doubleBufferGraphics.fillOval(30, 430, 25, 25);
+        }
+        doubleBufferGraphics.drawString("player speed: " + this.speedSetting, 70, 150);
+        doubleBufferGraphics.drawString("player size: " + this.playersizeSetting,70,250);
+        doubleBufferGraphics.drawString("Number of boosts: " + this.boostNumberSettings,70,350);
+        doubleBufferGraphics.drawString("Boost Speed: " + this.boostSpeedSettings,70,450);
+        repaint();
+    }
 
     /**
      *starts a round, puts players in right spots, resets boosts, resets booleans and such
@@ -132,15 +155,17 @@ class Game extends JPanel implements KeyListener, ActionListener{
         //sets players initial positions
         player2.setPosition(WINDOWWIDTH - 200, (((WINDOWHEIGHT - 88) / 2) - (player2.getSidelength())));
         player2.setDirection(270);
-        player2.setColor(Color.blue);
-        player2.setSideLength(PLAYERSIZE);
-        player2.setBoostsLeft(3);
+        player2.setColor(Color.cyan);
+        player2.setSideLength(playersizeSetting);
+        player2.setBoostsLeft(boostNumberSettings);
+        player2.setSpeed(speedSetting);
         boost1Hit = 0;
         player1.setPosition(200, (WINDOWHEIGHT - 88)/2 - (player2.getSidelength()));
         player1.setDirection(90);
         player1.setColor(Color.red);
-        player1.setBoostsLeft(3);
-        player1.setSideLength(PLAYERSIZE);
+        player1.setBoostsLeft(boostNumberSettings);
+        player1.setSideLength(playersizeSetting);
+        player1.setSpeed(speedSetting);
 //        try {
 //            player1.setSprite(ImageIO.read(getClass().getResource("sprites/Audi_Left.png")));
 //        } catch (IOException e) {
@@ -233,15 +258,15 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
         //sets player boosts to run for approx 50 frames when boost button is hit
         if (boost1Hit > this.frames) {
-            player2.boost(BOOSTSPEED);
+            player2.boost(boostSpeedSettings);
         } else {
-            player2.boostStop(SPEED);
+            player2.boostStop(speedSetting);
             boostSound1.stop();
         }
         if (boost2Hit > this.frames) {
-            player1.boost(BOOSTSPEED);
+            player1.boost(boostSpeedSettings);
         } else {
-            player1.boostStop(SPEED);
+            player1.boostStop(speedSetting);
         }
 
         //changes players sprites based on direction
@@ -319,15 +344,59 @@ class Game extends JPanel implements KeyListener, ActionListener{
     public void keyReleased(KeyEvent k){
         int keyCode = k.getKeyCode();
 
-        //have to put these here so boost method runs before decrement of boostsLeft
-        if (keyCode == KeyEvent.VK_UP) {
-            if (player2.getBoostsLeft() > 0) {
-                player2.setBoostsLeft(player2.getBoostsLeft() - 1);
+        if (keyCode == KeyEvent.VK_RIGHT) {
+            if (gameStarted == false) {
+                if (settingsSelection == 0) {
+                    this.speedSetting++;
+                    this.speedSetting = this.speedSetting % 7;
+                }
+                if (settingsSelection == 1){
+                    this.playersizeSetting++;
+                    this.playersizeSetting = this.playersizeSetting % 15;
+
+                }
+                if (settingsSelection == 2){
+                    this.boostNumberSettings++;
+                }
+                if (settingsSelection == 3){
+                    this.boostSpeedSettings++;
+                    this.boostSpeedSettings = this.boostSpeedSettings % 10;
+                }
+
+
+                settings();
             }
         }
+        if (keyCode == KeyEvent.VK_DOWN){
+            settingsSelection ++;
+            settingsSelection = settingsSelection % 4;
+            settings();
+        }
+
+        //have to put these here so boost method runs before decrement of boostsLeft
+        if (keyCode == KeyEvent.VK_UP) {
+            if (gameStarted == true){
+                if (player2.getBoostsLeft() > 0) {
+                    player2.setBoostsLeft(player2.getBoostsLeft() - 1);
+                }
+            }
+            else{
+                settingsSelection--;
+                if (settingsSelection < 0){
+                    settingsSelection = 3;
+                }
+                settings();
+            }
+        }
+
         if (keyCode == KeyEvent.VK_W){
             if (player1 .getBoostsLeft() > 0) {
                 player1.setBoostsLeft(player1.getBoostsLeft() - 1);
+            }
+        }
+        if (keyCode == KeyEvent.VK_S){
+            if (gameStarted == false) {
+                settings();
             }
         }
         if (keyCode == KeyEvent.VK_ENTER){
