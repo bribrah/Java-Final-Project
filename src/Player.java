@@ -7,12 +7,13 @@ class Player {
     //setPosition of player on the board
     private int xPos;
     private int yPos;
+    private int lastX;
+    private int lastY;
     private int direction;
     private Color color;
     private int sideLength;
     //how fast the car is moving (used for boost)
     private int speed;
-    private int boostSpeed;
     private int boostsLeft;
     private int score = 0;
 
@@ -156,6 +157,9 @@ class Player {
     public void draw(Graphics2D g) {
         g.setColor(this.color);
         g.fillRect(this.xPos, this.yPos, this.sideLength, this.sideLength);
+        if (this.speed>this.sideLength){
+
+        }
         //g.drawImage(this.sprite,this.xPos,this.yPos,null);
     }
 
