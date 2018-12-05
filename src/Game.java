@@ -43,7 +43,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
     // SOUNDS
     private AudioClip crash;
-    private AudioClip music;
     private AudioClip boostSound1;
     private AudioClip boostSound2;
     private AudioClip roundStart;
@@ -128,6 +127,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
     public void settings(){
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
+        ((Graphics2D) doubleBufferGraphics).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         settings = true;
         doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
         doubleBufferGraphics.setColor(Color.white);
