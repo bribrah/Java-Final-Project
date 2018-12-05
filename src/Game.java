@@ -11,7 +11,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private Player player2 = new Player();
     private Player player1 = new Player();
 
-
     private Timer dt;
     private static Image doubleBuffer;
     private Graphics doubleBufferGraphics;
@@ -292,12 +291,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
             else if (player1Win) {
                 g.setFont(new Font("Cambria", Font.BOLD, 50));
                 g.setColor(Color.magenta);
-                g.drawString("PLAYER 1 WINS ROUND", WINDOWWIDTH / 2 - 250, WINDOWHEIGHT / 2 - 50);
+                g.drawString("PLAYER 1 WINS ROUND", WINDOWWIDTH / 2 - 330, WINDOWHEIGHT / 2 - 50);
             }
             else if (player2Win) {
                 g.setFont(new Font("Cambria", Font.BOLD, 50));
                 g.setColor(Color.magenta);
-                g.drawString("PLAYER 2 WINS ROUND", WINDOWWIDTH / 2 - 250, WINDOWHEIGHT / 2 - 50);
+                g.drawString("PLAYER 2 WINS ROUND", WINDOWWIDTH / 2 - 330, WINDOWHEIGHT / 2 - 50);
             }
         }
 
