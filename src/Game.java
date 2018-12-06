@@ -11,10 +11,10 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private Player player2 = new Player();
     private Player player1 = new Player();
 
-    private Timer dt;
-    private static Image doubleBuffer;
-    private Graphics doubleBufferGraphics;
-    private int frames; //holds current frame value
+    static Timer dt;
+    static Image doubleBuffer;
+    static Graphics doubleBufferGraphics;
+    static int frames; //holds current frame value
     private int boost1Hit; //holds the frame value when boost is hit
     private int boost2Hit;
     private boolean player1Win;
@@ -22,33 +22,33 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private boolean gameWon;
     private static Image splashScreen;
     private boolean gameStarted = false;
-    private boolean settings = false;
+    public boolean settings = false;
 
     //CONSTANTS
-    private int FRAMEDELAY = 15;
-    private int BOOSTTIME = 60;
+    static int FRAMEDELAY = 15;
+    static int BOOSTTIME = 60;
     static int WINDOWWIDTH = 1000;
     static int WINDOWHEIGHT = 800;
 
     private static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
 
     // SETTINGS
-    private static int playersizeSetting = 7;
-    private static int speedSetting = 3;
-    private static int settingsSelection = 0;
-    private static int boostNumberSettings = 3;
-    private static int boostSpeedSettings = 7;
+    static int playersizeSetting = 7;
+    static int speedSetting = 3;
+    static int settingsSelection = 0;
+    static int boostNumberSettings = 3;
+    static int boostSpeedSettings = 7;
     Color player1Color = Color.red;
     Color player2Color = Color.blue;
     boolean player1Picked = false;
     static int playTill = 5;
 
     // SOUNDS
-    private AudioClip crash;
-    private AudioClip boostSound1;
-    private AudioClip boostSound2;
-    private AudioClip roundStart;
-    private AudioClip cheer;
+    static AudioClip crash;
+    static AudioClip boostSound1;
+    static AudioClip boostSound2;
+    static AudioClip roundStart;
+    static AudioClip cheer;
 
 
     //sprites
@@ -149,7 +149,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
         doubleBufferGraphics = doubleBuffer.getGraphics();
         ((Graphics2D) doubleBufferGraphics).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         settings = true;
-        doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
+
         doubleBufferGraphics.setColor(Color.white);
         doubleBufferGraphics.setFont(new Font("Cambria", Font.BOLD, 60));
         doubleBufferGraphics.drawString("SETTINGS",getWidth()/2 -130 ,85);
@@ -189,23 +189,22 @@ class Game extends JPanel implements KeyListener, ActionListener{
     }
 
     /**
+     * resets buffer image
+     */
+    public void resetBufferImage(){
+        doubleBuffer = createImage(getWidth(),getHeight() - 50);
+        doubleBufferGraphics = doubleBuffer.getGraphics();
+        doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
+    }
+    /**
      *starts a round, puts players in right spots, resets boosts, resets booleans and such
      * also clears the doubleBufferGraphics so that the old trails get deleted
      */
     public void roundStart(){
         if (!gameStarted){
-
-
-
-
-            doubleBuffer = createImage(getWidth(),getHeight() - 50);
-            doubleBufferGraphics = doubleBuffer.getGraphics();
             gameStarted = true;
-
         }
-        doubleBuffer = createImage(getWidth(),getHeight() - 50);
-        doubleBufferGraphics = doubleBuffer.getGraphics();
-        doubleBufferGraphics.clearRect(0,0,WINDOWWIDTH,WINDOWHEIGHT);
+        resetBufferImage();
         repaint();
 
         //sets players initial positions
@@ -356,7 +355,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
         }
 
 
-        //sets player boosts to run for approx 50 frames when boost button is hit
+        //sets player boosts to run for approx 50 frames from when boost button is hit
         if (boost1Hit > this.frames) {
             player2.boost(boostSpeedSettings);
         } else {
