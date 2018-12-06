@@ -27,9 +27,9 @@ class Game extends JPanel implements KeyListener, ActionListener{
     //CONSTANTS
     private int FRAMEDELAY = 15;
     private int BOOSTTIME = 60;
-    public static int WINDOWWIDTH = 1000;
-    public static int WINDOWHEIGHT = 800;
-    private static String GAMETITLE = "Burnout Battle";
+    static int WINDOWWIDTH = 1000;
+    static int WINDOWHEIGHT = 800;
+
     private static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
 
     // SETTINGS
@@ -38,6 +38,9 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private static int settingsSelection = 0;
     private static int boostNumberSettings = 3;
     private static int boostSpeedSettings = 7;
+    Color player1Color = Color.red;
+    Color player2Color = Color.blue;
+    boolean player1Picked = false;
     static int playTill = 5;
 
     // SOUNDS
@@ -64,29 +67,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
 //        }
 //    }
 
-    /**
-     *makes game window and adds keylistener for keystrokes
-     * adds Game to gameWindow
-     * initializes game by calling game.init();
-     */
-    public static void main(String[] args){
-        JFrame gameWindow = new JFrame(GAMETITLE);
-        gameWindow.setBounds(0,0,WINDOWWIDTH,WINDOWHEIGHT);
-        gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameWindow.setResizable(false);
-        gameWindow.setBackground(Color.black);
-
-        Game game = new Game();
-        gameWindow.getContentPane().add(game);
-
-        gameWindow.setVisible(true);
-        gameWindow.addKeyListener(game);
-        game.init();
-
-
-    }
-
-
 
     /**
      * initializes game structures that are needed
@@ -94,7 +74,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
      * draws the splash screen on the screen
      * initializes all sounds
      */
-    public void init(){
+    public void init() throws InterruptedException {
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
         try {
@@ -114,10 +94,51 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
 
         dt = new Timer(FRAMEDELAY, this);
-        repaint();
-
+        //needed to prevent a null exception error cause by repaint(). Error is silent/ does not cause anything but clogs up log
+        try {
+            repaint();
+        } catch (Exception e) {
+        }
     }
 
+    /**
+     * Method to make a color chooser window upon game getting called from settings menu. Sets player1 color and
+     * player 2 color depending on what users choose. These variables are then used
+     * later to set colors of multiple graphics.
+     */
+    private void chooseColor(){
+        player1Picked = false;
+        final JFrame colorChooserWindow = new JFrame();
+        JPanel chooserContainer = new JPanel();
+        final JColorChooser colorChooser = new JColorChooser(Color.red);
+        colorChooserWindow.setBounds(0,0,650,450);
+
+        final JLabel banner = new JLabel("Player 1 Choose Color",SwingConstants.CENTER);
+        banner.setFont(new Font("Cambria",Font.BOLD, 30));
+        chooserContainer.add(banner);
+        chooserContainer.add(colorChooser);
+        JButton next = new JButton("Next");
+        next.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (!player1Picked){
+                    player1Color = colorChooser.getColor();
+                    banner.setText("Player 2 Choose Color");
+                    colorChooser.setColor(player2Color);
+                    player1Picked =true;
+                }
+                else {
+                    player2Color = colorChooser.getColor();
+                    colorChooserWindow.setVisible(false);
+                }
+            }
+        });
+        chooserContainer.add(next);
+
+        player1Color = colorChooser.getColor();
+        colorChooserWindow.getContentPane().add(chooserContainer);
+        colorChooserWindow.setVisible(true);
+
+    }
     /**
      * This is my display for the settings page
      * It has current settings and can be changed
@@ -138,25 +159,29 @@ class Game extends JPanel implements KeyListener, ActionListener{
             doubleBufferGraphics.fillOval(30, 130, 25, 25);
         }
         else if(settingsSelection == 1){
-            doubleBufferGraphics.fillOval(30, 230, 25, 25);
+            doubleBufferGraphics.fillOval(30, 204, 25, 25);
         }
         else if(settingsSelection == 2){
-            doubleBufferGraphics.fillOval(30, 330, 25, 25);
+            doubleBufferGraphics.fillOval(30, 277, 25, 25);
         }
         else if (settingsSelection == 3){
-            doubleBufferGraphics.fillOval(30, 430, 25, 25);
+            doubleBufferGraphics.fillOval(30, 352, 25, 25);
         }
         else if (settingsSelection == 4){
-            doubleBufferGraphics.fillOval(30,530,25,25);
+            doubleBufferGraphics.fillOval(30,425,25,25);
+        }
+        else if(settingsSelection == 5){
+            doubleBufferGraphics.fillOval(30,499,25,25);
         }
 
         doubleBufferGraphics.drawString("Use arrow keys to go up and down and change settings (left right)", 40,650);
         doubleBufferGraphics.setColor(Color.red);
         doubleBufferGraphics.drawString("player speed: " + speedSetting, 70, 150);
-        doubleBufferGraphics.drawString("player size: " + playersizeSetting,70,250);
-        doubleBufferGraphics.drawString("Number of boosts: " + boostNumberSettings,70,350);
-        doubleBufferGraphics.drawString("Boost Speed: " + boostSpeedSettings,70,450);
-        doubleBufferGraphics.drawString("Play Till: " + playTill +" wins", 70, 550);
+        doubleBufferGraphics.drawString("player size: " + playersizeSetting,70,225);
+        doubleBufferGraphics.drawString("Number of boosts: " + boostNumberSettings,70,300);
+        doubleBufferGraphics.drawString("Boost Speed: " + boostSpeedSettings,70,375);
+        doubleBufferGraphics.drawString("Play Till: " + playTill +" wins", 70, 450);
+        doubleBufferGraphics.drawString("Change Player Colors -->", 70, 525);
         doubleBufferGraphics.setColor(Color.green);
         doubleBufferGraphics.setFont(new Font("Cambria",Font.BOLD,40));
         doubleBufferGraphics.drawString("Press Enter to start game!", 220,730);
@@ -169,6 +194,10 @@ class Game extends JPanel implements KeyListener, ActionListener{
      */
     public void roundStart(){
         if (!gameStarted){
+
+
+
+
             doubleBuffer = createImage(getWidth(),getHeight() - 50);
             doubleBufferGraphics = doubleBuffer.getGraphics();
             gameStarted = true;
@@ -182,14 +211,14 @@ class Game extends JPanel implements KeyListener, ActionListener{
         //sets players initial positions
         player2.setPosition(WINDOWWIDTH - 200, (((WINDOWHEIGHT - 88) / 2) - (player2.getSidelength())));
         player2.setDirection(270);
-        player2.setColor(Color.cyan);
+        player2.setColor(player2Color);
         player2.setSideLength(playersizeSetting);
         player2.setBoostsLeft(boostNumberSettings);
         player2.setSpeed(speedSetting);
         boost1Hit = 0;
         player1.setPosition(200, (WINDOWHEIGHT - 88)/2 - (player2.getSidelength()));
         player1.setDirection(90);
-        player1.setColor(Color.red);
+        player1.setColor(player1Color);
         player1.setBoostsLeft(boostNumberSettings);
         player1.setSideLength(playersizeSetting);
         player1.setSpeed(speedSetting);
@@ -237,12 +266,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
             //sets font and draws the left portion of the bottom info bar
             g.setFont(new Font("Cambria", Font.BOLD, 30));
-            g.setColor(Color.red);
+            g.setColor(player1Color);
             g.drawString("Player 1 Boosts: " + player1.getBoostsLeft(), 50, BOTTOMTEXTYPOS);
             g.drawString(String.valueOf(player1.getScore()), WINDOWWIDTH / 2 - 50, BOTTOMTEXTYPOS);
 
             //changes color and draws right portion of bottom info bar
-            g.setColor(Color.blue);
+            g.setColor(player2Color);
             g.drawString("Player 2 Boosts: " + player2.getBoostsLeft(), WINDOWWIDTH - 350, BOTTOMTEXTYPOS);
             g.drawString(String.valueOf(player2.getScore()), WINDOWWIDTH / 2 + 50, BOTTOMTEXTYPOS);
         }
@@ -273,11 +302,11 @@ class Game extends JPanel implements KeyListener, ActionListener{
             if (gameWon){
                 g.setFont(new Font("Cambria",Font.BOLD,90));
                 if (player1Win){
-                    g.setColor(Color.red);
+                    g.setColor(player1Color);
                     g.drawString("PLAYER 1 WINS GAME!!!",20,WINDOWHEIGHT/2 - 100);
                 }
                 if (player2Win){
-                    g.setColor(Color.blue);
+                    g.setColor(player2Color);
                     g.drawString("PLAYER 2 WINS GAME!!!",20,WINDOWHEIGHT/2 - 100);
                 }
                 try {
@@ -445,6 +474,9 @@ class Game extends JPanel implements KeyListener, ActionListener{
                         playTill++;
                     }
                 }
+                if (settingsSelection == 5){
+                    chooseColor();
+                }
                 settings();
             }
         }
@@ -485,7 +517,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
             if (keyCode == KeyEvent.VK_DOWN) {
                 if (settings) {
                     settingsSelection++;
-                    settingsSelection = settingsSelection % 5;
+                    settingsSelection = settingsSelection % 6;
                     settings();
                 }
             }
@@ -495,7 +527,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
                 if (settings) {
                     settingsSelection--;
                     if (settingsSelection < 0) {
-                        settingsSelection = 4;
+                        settingsSelection = 5;
                     }
                     settings();
                 }
