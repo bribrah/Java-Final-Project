@@ -17,9 +17,6 @@ class Player {
     private int boostsLeft;
     private int score = 0;
 
-    //car sprite
-    private Image sprite;
-
 
     //////////////////CONSTRUCTORS/////////////
 
@@ -33,14 +30,6 @@ class Player {
     }
 
     //////////GETTERS and SETTERS////////
-
-    /**
-     * sets players sprite
-     * @param sprite image of sprite that the player will now bw associated with
-     */
-    public void setSprite(Image sprite){
-        this.sprite = sprite;
-    }
 
     /**
      * gives the players sideLength
@@ -132,7 +121,6 @@ class Player {
      */
     public void turnRight() {
         int direction = this.direction + 90;
-        this.sprite = this.sprite;
         if (direction > 360) {
             this.direction = direction % 360;
         } else {
@@ -220,7 +208,26 @@ class Player {
         else{
             return false;
         }
+    }
 
+    /**
+     * used for single player version of game
+     * detects if player collides with blue dots
+     */
+    public boolean blueCollison(){
+        if (this.direction == 0 || this.direction == 360) {
+            return SinglePlayer.isBlue(this.xPos, this.yPos - 1);
+
+        } else if (this.direction == 90) {
+            return SinglePlayer.isBlue(this.xPos + this.sideLength + 1, this.yPos);
+        } else if (this.direction == 180) {
+            return SinglePlayer.isBlue(this.xPos, this.yPos + this.sideLength + 1);
+        } else if (this.direction == 270) {
+            return SinglePlayer.isBlue(this.xPos - 1, this.yPos);
+        }
+        else{
+            return false;
+        }
     }
 }
 

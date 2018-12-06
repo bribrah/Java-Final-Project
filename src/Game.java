@@ -23,6 +23,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private static Image splashScreen;
     private boolean gameStarted = false;
     public boolean settings = false;
+    public static boolean singlePlayer = false;
 
     //CONSTANTS
     static int FRAMEDELAY = 15;
@@ -85,7 +86,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
         doubleBufferGraphics.drawImage(splashScreen,0,0,this);
 
         //SOUNDS INIT
-        //music = Applet.newAudioClip(getClass().getResource("Sounds/test2.wav"));
         crash = Applet.newAudioClip(getClass().getResource("Sounds/crash.wav"));
         boostSound1 = Applet.newAudioClip(getClass().getResource("Sounds/boostSound.wav"));
         boostSound2 = Applet.newAudioClip(getClass().getResource("Sounds/boostSound.wav"));
@@ -396,7 +396,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
     public static boolean isEmpty(int x, int y){
         BufferedImage arenaGrid = (BufferedImage) doubleBuffer;
         Color pixelColor = new Color(arenaGrid.getRGB(x,y));
-        return pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getBlue() == 0;
+        if (!singlePlayer) {
+            return pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getBlue() == 0;
+        }
+        else{
+            return (pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getBlue() == 0)|| (pixelColor.getBlue() == 255);
+        }
 
     }
 
