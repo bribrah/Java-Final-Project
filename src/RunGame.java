@@ -19,6 +19,7 @@ public static void main(String[] args) throws InterruptedException {
 
     final JFrame singleOrMultiplayer = new JFrame("Single or Multipler Choice");
     singleOrMultiplayer.setBounds(0,0,500,200);
+    singleOrMultiplayer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     JPanel buttonContainer = new JPanel();
     JButton multiPlayerButton = new JButton("MultPlayer");
     JButton singlePlayerButton = new JButton("SinglePlayer");

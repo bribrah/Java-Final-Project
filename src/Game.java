@@ -31,7 +31,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
     static int WINDOWWIDTH = 1000;
     static int WINDOWHEIGHT = 800;
 
-    private static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
+    static int BOTTOMTEXTYPOS = WINDOWHEIGHT - 50;
 
     // SETTINGS
     static int playersizeSetting = 7;
@@ -50,23 +50,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
     static AudioClip boostSound2;
     static AudioClip roundStart;
     static AudioClip cheer;
-
-
-    //sprites
-    //Image player1Up,player1Right,player1Down,player1Left;
-
-//    {
-//        try {
-//            player1Up = ImageIO.read(getClass().getResource("sprites/Audi_Up.png"));
-//            player1Right = ImageIO.read(getClass().getResource("sprites/Audi_Right.png"));
-//            player1Down = ImageIO.read(getClass().getResource("sprites/Audi_Down.png"));
-//            player1Left = ImageIO.read(getClass().getResource("sprites/Audi_Left.png"));
-//
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
 
     /**
@@ -368,19 +351,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
             player1.boostStop(speedSetting);
         }
 
-        //changes players sprites based on direction
-//        if (player1.getDirection() == 0 || player1.getDirection() == 360) {
-////            player1.setSprite(player1Up);
-////        }
-////        else if (player1.getDirection() == 90){
-////            player1.setSprite(player1Right);
-////        }
-////        else if (player1.getDirection() == 180){
-////            player1.setSprite((player1Down));
-////        }
-////        else if (player1.getDirection() == 270){
-////            player1.setSprite((player1Left));
-////        }
             player2.update();
             player1.update();
             repaint();

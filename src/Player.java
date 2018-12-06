@@ -58,6 +58,13 @@ class Player {
         this.xPos = x;
         this.yPos = y;
     }
+    public int getxPos(){
+        return this.xPos;
+    }
+
+    public int getyPos(){
+        return this.yPos;
+    }
 
     /**
      * Sets direction player is pointing in
@@ -145,10 +152,6 @@ class Player {
     public void draw(Graphics2D g) {
         g.setColor(this.color);
         g.fillRect(this.xPos, this.yPos, this.sideLength, this.sideLength);
-        if (this.speed>this.sideLength){
-
-        }
-        //g.drawImage(this.sprite,this.xPos,this.yPos,null);
     }
 
     /**
@@ -192,42 +195,33 @@ class Player {
      * @return returns true if collision is detected, returns false if not
      */
     public boolean collison() {
-        if (this.xPos > Game.WINDOWWIDTH - this.sideLength - 20 || this.xPos < 5 || this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
+        if (this.xPos > Game.WINDOWWIDTH - this.sideLength - 20 || this.xPos < 5 ||
+                this.yPos > Game.WINDOWHEIGHT - this.sideLength - 92|| this.yPos < 5){
             return true;
         }
         else if (this.direction == 0 || this.direction == 360) {
-            return !Game.isEmpty(this.xPos, this.yPos - 1);
+            return !Game.isEmpty(this.xPos, this.yPos - 1) ||
+                    !Game.isEmpty(this.xPos + sideLength, this.yPos - 1);
 
         } else if (this.direction == 90) {
-            return !Game.isEmpty(this.xPos + this.sideLength + 1, this.yPos);
+            return !Game.isEmpty(this.xPos + this.sideLength + 1, this.yPos)||
+                    !Game.isEmpty(this.xPos + this.sideLength + 1, this.yPos + this.sideLength);
         } else if (this.direction == 180) {
-            return !Game.isEmpty(this.xPos, this.yPos + this.sideLength + 1);
+            return !Game.isEmpty(this.xPos, this.yPos + this.sideLength + 1)||
+                    !Game.isEmpty(this.xPos+sideLength,this.yPos + this.sideLength + 1);
         } else if (this.direction == 270) {
-            return !Game.isEmpty(this.xPos - 1, this.yPos);
+            return !Game.isEmpty(this.xPos - 1, this.yPos)||
+                    !Game.isEmpty(this.xPos -1, this.yPos + sideLength);
         }
         else{
             return false;
         }
     }
 
-    /**
-     * used for single player version of game
-     * detects if player collides with blue dots
-     */
-    public boolean blueCollison(){
-        if (this.direction == 0 || this.direction == 360) {
-            return SinglePlayer.isBlue(this.xPos, this.yPos - 1);
 
-        } else if (this.direction == 90) {
-            return SinglePlayer.isBlue(this.xPos + this.sideLength + 1, this.yPos);
-        } else if (this.direction == 180) {
-            return SinglePlayer.isBlue(this.xPos, this.yPos + this.sideLength + 1);
-        } else if (this.direction == 270) {
-            return SinglePlayer.isBlue(this.xPos - 1, this.yPos);
-        }
-        else{
-            return false;
-        }
+    public boolean pointCollision(int x,int y){
+        return (xPos > x && xPos < x + 15 && yPos > y && yPos < y + 15) ||
+                (xPos + sideLength > x && xPos < x + 15 && yPos + sideLength > y && yPos < y + 15);
     }
 }
 
