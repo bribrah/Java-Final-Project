@@ -4,9 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.Array;
 
 public class SinglePlayer extends Game {
 
@@ -18,22 +16,40 @@ public class SinglePlayer extends Game {
     private boolean point1Got = false;
     private boolean point2Got = false;
     private boolean point3Got = false;
+    private int pointsOnLevel;
     private AudioClip point;
 
     //LEVELS
+    int[] pointGottenArray;
+
+    private Image[] levelArray;
+
     private static Image level1;
     private static Image level2;
     private static Image level3;
+
+    private int[] level1PointCoords= new int[] {200,200,WINDOWWIDTH-100,300,500,500};
+    private int[] level2PointCoords = new int[] {550,234,47,57,896, 610};
+    private int[] level3PointCoords = new int[] {535,358,412,383,38,365,470,113,354,653};
+
+    private int[][] pointCoordsArray = new int[][] {level1PointCoords,level2PointCoords,level3PointCoords};
+
+    public void loadResources() throws IOException {
+        level1 = ImageIO.read(getClass().getResource("Levels/level1.png"));
+        level2 = ImageIO.read(getClass().getResource("Levels/level2.png"));
+        level3 = ImageIO.read(getClass().getResource("Levels/level3.png"));
+        point = Applet.newAudioClip(getClass().getResource("Sounds/point.wav"));
+        levelArray = new Image[] {level1,level2,level3};
+    }
 
     public void init() throws InterruptedException {
         super.init();
         singlePlayer = true;
         try {
-            level3 = ImageIO.read(getClass().getResource("Levels/level3.png"));
+            loadResources();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        point = Applet.newAudioClip(getClass().getResource("Sounds/point.wav"));
     }
 
     public void roundStart(){
@@ -42,36 +58,26 @@ public class SinglePlayer extends Game {
     repaint();
 
     //sets players initial positions
-
-    player.setPosition(200, (WINDOWHEIGHT - 88)/2 - (player.getSidelength()));
-    player.setDirection(90);
-    player.setColor(player1Color);
-    player.setBoostsLeft(boostNumberSettings);
-    player.setSideLength(playersizeSetting);
-
-    player.setPosition(WINDOWWIDTH - 200, (WINDOWHEIGHT - 88)/2 - (player.getSidelength()));
+    player.setPosition(924, 362);
     player.setDirection(270);
     player.setColor(player1Color);
-    player.setBoostsLeft(boostNumberSettings);
     player.setSideLength(10);
-
-    player.setSpeed(speedSetting);
-
-    settings = false;
-
+    player.setSpeed(3);
     points = 0;
     point1Got = false;
     point2Got = false;
     point3Got =false;
-
-    if (level == 3){
-        doubleBufferGraphics.drawImage(level3,0,0,this);
-    }
+    resetLevel();
 
     levelStarted = true;
     }
 
 
+    public void resetLevel(){
+        pointGottenArray =  new int[100];
+        doubleBufferGraphics.drawImage(levelArray[level - 1],0,0,this);
+
+    }
 
     public void paint (Graphics g) {
         super.paint(g);
@@ -90,81 +96,69 @@ public class SinglePlayer extends Game {
             //sets font and draws the left portion of the bottom info bar
             g.setFont(new Font("Cambria", Font.BOLD, 30));
             g.setColor(Color.red);
-            g.drawString("Points needed: " + points, 50, BOTTOMTEXTYPOS);
+            g.drawString("Level: " + level, 50,BOTTOMTEXTYPOS);
+            g.drawString("Points needed: " + (pointsOnLevel - points), 600, BOTTOMTEXTYPOS);
         }
     }
 
     public void draw(Graphics2D g){
-
-
         if (!settings) {
-            if (level == 1 && levelStarted){
-                level1(g);
+            if (levelStarted) {
+                levelDraw(g, pointCoordsArray[level -1]);
             }
-
             g.setColor(Color.black);
             player.draw(g);
             }
 
     }
 
-    public void level1(Graphics2D g){
-        g.setColor(Color.blue);
-
-
-        g.fillRect(200,200,15,15);
-        g.fillRect(WINDOWWIDTH - 100, 300, 15 , 15);
-        g.fillRect(WINDOWWIDTH-200, WINDOWHEIGHT-150, 15,15);
+    public void levelDraw(Graphics2D g, int[] pointArray){
+        pointsOnLevel = pointArray.length /2;
+        for (int i = 0; i<pointArray.length; i+= 2){
+            g.setColor(Color.blue);
+            g.fillRect(pointArray[i],pointArray[i+1],15,15);
+            if (pointGottenArray[i] == 1){
+                g.setColor(Color.magenta) ;
+                g.fillRect(pointArray[i],pointArray[i+1],15,15);
+            }
+        }
     }
 
 
     public void actionPerformed(ActionEvent e) {
-        frames++;
         player.update();
 
         //what happens when a player collides
-        repaint();
         if (player.collison()){
             crash.play();
             dt.stop();
         }
-        if (playerBoostHit > frames){
-            player.boost(boostSpeedSettings);
-        }
-        else{
-            player.boostStop(speedSetting);
-        }
-        level1Points();
+        pointCollisions(pointCoordsArray[level - 1]);
+        repaint();
+
     }
 
-    public void level1Points(){
-        if (level == 1){
-            if (!point1Got){
-                if (player.pointCollision(200,200)){
-                    point.play();
-                    points++;
-                    point1Got = true;
-                }
-            }
-            if (!point2Got){
-                if (player.pointCollision(WINDOWWIDTH - 100, 300)){
-                    point.play();
-                    points++;
-                    point2Got = true;
-                }
-            }
-            if (!point3Got){
-                if (player.pointCollision(WINDOWWIDTH-200, WINDOWHEIGHT-150)){
-                    point.play();
-                    points++;
-                    point2Got = true;
-                }
-            }
-            if (points == 3){
-                dt.stop();
-                level = 3;
+
+    public void pointCollisions(int[] pointCoords){
+        for (int i = 0; i < pointCoords.length; i+= 2){
+            if (player.pointCollision(pointCoords[i],pointCoords[i+1]) && pointGottenArray[i] != 1){
+                pointGottenArray[i] = 1;
+                point.play();
+                points++;
             }
         }
+        if (points == pointsOnLevel){
+            winMessage();
+            dt.stop();
+            level++;
+        }
+    }
+
+    public void winMessage(){
+        doubleBufferGraphics.setColor(Color.magenta);
+        doubleBufferGraphics.setFont(new Font("Cambira",Font.BOLD,50));
+        doubleBufferGraphics.drawString("LEVEL " + level + " COMPLETED", 250,WINDOWHEIGHT/2-50);
+        doubleBufferGraphics.setColor(Color.red);
     }
     public void keyPressed(KeyEvent k){
         int keyCode = k.getKeyCode();
@@ -173,12 +167,6 @@ public class SinglePlayer extends Game {
         }
         else if (keyCode == KeyEvent.VK_RIGHT){
             player.turnRight();
-        }
-        if (keyCode == KeyEvent.VK_UP) {
-            if (player.getBoostsLeft() > 0){
-                boostSound1.play();
-            }
-            playerBoostHit = frames + BOOSTTIME;
         }
 
     }
