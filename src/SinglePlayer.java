@@ -18,6 +18,7 @@ public class SinglePlayer extends Game {
     private boolean point3Got = false;
     private int pointsOnLevel;
     private AudioClip point;
+    private Image splashScreen;
 
     //LEVELS
     int[] pointGottenArray;
@@ -27,29 +28,35 @@ public class SinglePlayer extends Game {
     private static Image level1;
     private static Image level2;
     private static Image level3;
+    private static Image level4;
 
     private int[] level1PointCoords= new int[] {200,200,WINDOWWIDTH-100,300,500,500};
     private int[] level2PointCoords = new int[] {550,234,47,57,896, 610};
     private int[] level3PointCoords = new int[] {535,358,412,383,38,365,470,113,354,653};
+    private int[] level4PointCoords = new int[] {630,324,828,89,865,214};
 
-    private int[][] pointCoordsArray = new int[][] {level1PointCoords,level2PointCoords,level3PointCoords};
+    private int[][] pointCoordsArray = new int[][] {level1PointCoords,level2PointCoords,level3PointCoords,level4PointCoords};
 
     public void loadResources() throws IOException {
+        splashScreen = ImageIO.read(getClass().getResource("splash image singleplayer.png"));
         level1 = ImageIO.read(getClass().getResource("Levels/level1.png"));
         level2 = ImageIO.read(getClass().getResource("Levels/level2.png"));
         level3 = ImageIO.read(getClass().getResource("Levels/level3.png"));
+        level4 = ImageIO.read(getClass().getResource("Levels/level4.png"));
         point = Applet.newAudioClip(getClass().getResource("Sounds/point.wav"));
-        levelArray = new Image[] {level1,level2,level3};
+        levelArray = new Image[] {level1,level2,level3,level4};
     }
 
     public void init() throws InterruptedException {
         super.init();
         singlePlayer = true;
+
         try {
             loadResources();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        doubleBufferGraphics.drawImage(splashScreen,0,0,this);
     }
 
     public void roundStart(){
@@ -62,7 +69,7 @@ public class SinglePlayer extends Game {
     player.setDirection(270);
     player.setColor(player1Color);
     player.setSideLength(10);
-    player.setSpeed(3);
+    player.setSpeed(4);
     points = 0;
     point1Got = false;
     point2Got = false;
@@ -103,7 +110,7 @@ public class SinglePlayer extends Game {
 
     public void draw(Graphics2D g){
         if (!settings) {
-            if (levelStarted) {
+            if (levelStarted  && level <= levelArray.length) {
                 levelDraw(g, pointCoordsArray[level -1]);
             }
             g.setColor(Color.black);
@@ -133,8 +140,8 @@ public class SinglePlayer extends Game {
             crash.play();
             dt.stop();
         }
-        pointCollisions(pointCoordsArray[level - 1]);
         repaint();
+        pointCollisions(pointCoordsArray[level - 1]);
 
     }
 
@@ -149,8 +156,15 @@ public class SinglePlayer extends Game {
         }
         if (points == pointsOnLevel){
             winMessage();
+            cheer.play();
             dt.stop();
             level++;
+            if (level>levelArray.length){
+                resetBufferImage();
+                doubleBufferGraphics.setFont(new Font("Cambria",Font.BOLD, 60));
+                doubleBufferGraphics.setColor(Color.orange);
+                doubleBufferGraphics.drawString("CONGRATULATIONS YOU WIN!", 100, WINDOWHEIGHT/2 -60);
+            }
         }
     }
 
