@@ -370,8 +370,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
             return pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getBlue() == 0;
         }
         else{
-            System.out.println(pixelColor.getBlue());
-            System.out.println(pixelColor.getRed());
             return (pixelColor.getBlue() == 0 && pixelColor.getRed() == 0 && pixelColor.getGreen() == 0)||
                     (pixelColor.getBlue() == 255 && pixelColor.getRed() ==0 && pixelColor.getGreen() ==0)||
                     (pixelColor.getBlue() == 255 && pixelColor.getRed() == 255 && pixelColor.getGreen() == 0);
