@@ -7,6 +7,13 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+/**
+ * Created by Brian Espinosa
+ * This class represents the game, which is the actual portion of the game window since game is a polymorphism
+ * of a JPanel and a Game class. This class contains all methods that induce rendering to the game window
+ * and handles registering of keystrokes in order to control the players.
+ */
+//satisfies polymoprphism and class inheritance
 class Game extends JPanel implements KeyListener, ActionListener{
     private Player player2 = new Player();
     private Player player1 = new Player();
@@ -136,7 +143,6 @@ class Game extends JPanel implements KeyListener, ActionListener{
         doubleBufferGraphics.setColor(Color.white);
         doubleBufferGraphics.setFont(new Font("Cambria", Font.BOLD, 60));
         doubleBufferGraphics.drawString("SETTINGS",getWidth()/2 -130 ,85);
-        doubleBufferGraphics.setFont(new Font("Times",Font.PLAIN,30));
 
         if (settingsSelection == 0) {
             doubleBufferGraphics.fillOval(30, 130, 25, 25);
@@ -157,7 +163,9 @@ class Game extends JPanel implements KeyListener, ActionListener{
             doubleBufferGraphics.fillOval(30,499,25,25);
         }
 
+        doubleBufferGraphics.setFont(new Font("Times",Font.PLAIN,28));
         doubleBufferGraphics.drawString("Use arrow keys to go up and down and change settings (left right)", 40,650);
+        doubleBufferGraphics.setFont(new Font("Times",Font.PLAIN,33));
         doubleBufferGraphics.setColor(Color.red);
         doubleBufferGraphics.drawString("player speed: " + speedSetting, 70, 150);
         doubleBufferGraphics.drawString("player size: " + playersizeSetting,70,225);

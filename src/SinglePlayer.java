@@ -9,14 +9,12 @@ import java.io.IOException;
 public class SinglePlayer extends Game {
 
     private Player player = new Player();
-    private int playerBoostHit;
     private int level = 1;
     private int points = 0;
+    private int lives = 0;
     private boolean levelStarted = false;
-    private boolean point1Got = false;
-    private boolean point2Got = false;
-    private boolean point3Got = false;
     private int pointsOnLevel;
+
     private AudioClip point;
     private Image splashScreen;
 
@@ -37,6 +35,10 @@ public class SinglePlayer extends Game {
 
     private int[][] pointCoordsArray = new int[][] {level1PointCoords,level2PointCoords,level3PointCoords,level4PointCoords};
 
+    /**
+     * loads all resources that require loading in
+     * @throws IOException
+     */
     public void loadResources() throws IOException {
         splashScreen = ImageIO.read(getClass().getResource("splash image singleplayer.png"));
         level1 = ImageIO.read(getClass().getResource("Levels/level1.png"));
@@ -47,6 +49,10 @@ public class SinglePlayer extends Game {
         levelArray = new Image[] {level1,level2,level3,level4};
     }
 
+    /**
+     * calls Game.init and also loads resources
+     * @throws InterruptedException
+     */
     public void init() throws InterruptedException {
         super.init();
         singlePlayer = true;
@@ -59,6 +65,12 @@ public class SinglePlayer extends Game {
         doubleBufferGraphics.drawImage(splashScreen,0,0,this);
     }
 
+    /**
+     * Method that is ran everytime round is started
+     * resets player position and points gotten logic, also resets double buffer graphics by calling
+     * resetlevel. if lives = 0 game starts over.
+     *
+     */
     public void roundStart(){
     resetBufferImage();
     ((Graphics2D) doubleBufferGraphics).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -71,14 +83,18 @@ public class SinglePlayer extends Game {
     player.setSideLength(10);
     player.setSpeed(4);
     points = 0;
-    point1Got = false;
-    point2Got = false;
-    point3Got =false;
+    if (lives == 0 ){
+        level = 1;
+        lives = 5;
+    }
     resetLevel();
 
     levelStarted = true;
     }
 
+    /**
+     * draws level based on current level and resets point gotten array.
+     */
 
     public void resetLevel(){
         pointGottenArray =  new int[100];
@@ -86,6 +102,11 @@ public class SinglePlayer extends Game {
 
     }
 
+    /**
+     * calls draw and paints the things that are there
+     * also draws the bottom text
+     * @param g the graphics object that is used to draw onto the doubleBuffer image
+     */
     public void paint (Graphics g) {
         super.paint(g);
         draw((Graphics2D) doubleBufferGraphics);
@@ -105,20 +126,33 @@ public class SinglePlayer extends Game {
             g.setColor(Color.red);
             g.drawString("Level: " + level, 50,BOTTOMTEXTYPOS);
             g.drawString("Points needed: " + (pointsOnLevel - points), 600, BOTTOMTEXTYPOS);
+            g.drawString("Lives: " + lives, (300), BOTTOMTEXTYPOS);
+
         }
+
     }
 
+    /**
+     * called when repain is called
+     * draws player and points
+     * @param g doublebufferGraphics should be passed here after being casted to Graphics2D
+     */
     public void draw(Graphics2D g){
         if (!settings) {
             if (levelStarted  && level <= levelArray.length) {
                 levelDraw(g, pointCoordsArray[level -1]);
             }
-            g.setColor(Color.black);
             player.draw(g);
+
             }
 
     }
 
+    /**
+     * logic to draw the points associated with whatever current level is
+     * @param g
+     * @param pointArray the coordinate array of the level.
+     */
     public void levelDraw(Graphics2D g, int[] pointArray){
         pointsOnLevel = pointArray.length /2;
         for (int i = 0; i<pointArray.length; i+= 2){
@@ -129,15 +163,27 @@ public class SinglePlayer extends Game {
                 g.fillRect(pointArray[i],pointArray[i+1],15,15);
             }
         }
+
     }
 
 
+    /**
+     * called every frame
+     * detects if collision, updates player position and repaints.
+     * @param e Each frame causes an actionevent
+     */
     public void actionPerformed(ActionEvent e) {
         player.update();
 
         //what happens when a player collides
         if (player.collison()){
+            lives --;
             crash.play();
+            if (lives == 0){
+                doubleBufferGraphics.setFont(new Font("Cambria",Font.BOLD, 60));
+                doubleBufferGraphics.setColor(Color.blue);
+                doubleBufferGraphics.drawString("You Lose! :(",300,WINDOWHEIGHT/2 - 60);
+            }
             dt.stop();
         }
         repaint();
@@ -146,6 +192,10 @@ public class SinglePlayer extends Game {
     }
 
 
+    /**
+     * logic to draw the hitboxes for the current levels points
+     * @param pointCoords the point coordinate array of the current level
+     */
     public void pointCollisions(int[] pointCoords){
         for (int i = 0; i < pointCoords.length; i+= 2){
             if (player.pointCollision(pointCoords[i],pointCoords[i+1]) && pointGottenArray[i] != 1){
@@ -159,21 +209,32 @@ public class SinglePlayer extends Game {
             cheer.play();
             dt.stop();
             level++;
-            if (level>levelArray.length){
-                resetBufferImage();
-                doubleBufferGraphics.setFont(new Font("Cambria",Font.BOLD, 60));
-                doubleBufferGraphics.setColor(Color.orange);
-                doubleBufferGraphics.drawString("CONGRATULATIONS YOU WIN!", 100, WINDOWHEIGHT/2 -60);
-            }
+
         }
     }
 
+    /**
+     * displays win message when player beats a level
+     */
     public void winMessage(){
-        doubleBufferGraphics.setColor(Color.magenta);
-        doubleBufferGraphics.setFont(new Font("Cambira",Font.BOLD,50));
-        doubleBufferGraphics.drawString("LEVEL " + level + " COMPLETED", 250,WINDOWHEIGHT/2-50);
+        if (level>levelArray.length){
+            resetBufferImage();
+            doubleBufferGraphics.setFont(new Font("Cambria",Font.BOLD, 60));
+            doubleBufferGraphics.setColor(Color.orange);
+            doubleBufferGraphics.drawString("CONGRATULATIONS YOU WIN!", 100, WINDOWHEIGHT/2 -60);
+        }
+        else {
+            doubleBufferGraphics.setColor(Color.magenta);
+            doubleBufferGraphics.setFont(new Font("Cambira", Font.BOLD, 50));
+            doubleBufferGraphics.drawString("LEVEL " + level + " COMPLETED", 250, WINDOWHEIGHT / 2 - 50);
+        }
         doubleBufferGraphics.setColor(Color.red);
     }
+
+    /**
+     * players controls
+     * @param k sent from keyListener
+     */
     public void keyPressed(KeyEvent k){
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_LEFT){
