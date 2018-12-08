@@ -16,6 +16,7 @@ class Player {
     private int speed;
     private int boostsLeft;
     private int score = 0;
+    private boolean directionalTurning = true;
 
 
     //////////////////CONSTRUCTORS/////////////
@@ -118,7 +119,13 @@ class Player {
         return this.speed;
     }
 
+    public boolean isDirectionalTurning(){
+        return this.directionalTurning;
+    }
 
+    public void setDirectionalTurning(){
+        this.directionalTurning = !this.directionalTurning;
+    }
     ///////////Methods////////
 
     /**
@@ -141,6 +148,16 @@ class Player {
             this.direction = 360;
         } else {
             this.direction = direction;
+        }
+    }
+
+    /**
+     * changes players direction but makes sure that it doesn't run into itself
+     * @param num angle of heading
+     */
+    public void directionalTurn(int num){
+        if (Math.abs(this.direction - num) != 180){
+            this.direction = num;
         }
     }
 

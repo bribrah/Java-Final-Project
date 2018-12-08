@@ -22,15 +22,15 @@ class Game extends JPanel implements KeyListener, ActionListener{
     static Image doubleBuffer;
     static Graphics doubleBufferGraphics;
     static int frames; //holds current frame value
-    private int boost1Hit; //holds the frame value when boost is hit
-    private int boost2Hit;
+    private int boost2Hit; //holds the frame value when boost is hit
+    private int boost1Hit;
     private boolean player1Win;
     private boolean player2Win;
     private boolean gameWon;
     private static Image splashScreen;
     private boolean gameStarted = false;
     public boolean settings = false;
-    public static boolean singlePlayer = false;
+    static boolean singlePlayer = false;
 
     //CONSTANTS
     static int FRAMEDELAY = 15;
@@ -96,7 +96,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
      * player 2 color depending on what users choose. These variables are then used
      * later to set colors of multiple graphics.
      */
-    private void chooseColor(){
+    public void chooseColor(){
         player1Picked = false;
         final JFrame colorChooserWindow = new JFrame();
         JPanel chooserContainer = new JPanel();
@@ -162,6 +162,13 @@ class Game extends JPanel implements KeyListener, ActionListener{
         else if(settingsSelection == 5){
             doubleBufferGraphics.fillOval(30,499,25,25);
         }
+        else if (settingsSelection == 6){
+            doubleBufferGraphics.fillOval(30,575,25,25);
+        }
+        else if (settingsSelection == 7){
+            doubleBufferGraphics.fillOval(365
+                    ,128,25,25);
+        }
 
         doubleBufferGraphics.setFont(new Font("Times",Font.PLAIN,28));
         doubleBufferGraphics.drawString("Use arrow keys to go up and down and change settings (left right)", 40,650);
@@ -173,9 +180,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
         doubleBufferGraphics.drawString("Boost Speed: " + boostSpeedSettings,70,375);
         doubleBufferGraphics.drawString("Play Till: " + playTill +" wins", 70, 450);
         doubleBufferGraphics.drawString("Change Player Colors -->", 70, 525);
+        doubleBufferGraphics.drawString("Player1 Directional Turning: " + player1.isDirectionalTurning(),70, 600);
+        doubleBufferGraphics.drawString("Player2 Directional Turning: " + player2.isDirectionalTurning(),400,150);
         doubleBufferGraphics.setColor(Color.green);
         doubleBufferGraphics.setFont(new Font("Cambria",Font.BOLD,40));
         doubleBufferGraphics.drawString("Press Enter to start game!", 220,730);
+
         repaint();
     }
 
@@ -205,7 +215,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
         player2.setSideLength(playersizeSetting);
         player2.setBoostsLeft(boostNumberSettings);
         player2.setSpeed(speedSetting);
-        boost1Hit = 0;
+        boost2Hit = 0;
         player1.setPosition(200, (WINDOWHEIGHT - 88)/2 - (player2.getSidelength()));
         player1.setDirection(90);
         player1.setColor(player1Color);
@@ -217,7 +227,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        boost2Hit = 0;
+        boost1Hit = 0;
         settings = false;
         player1Win = false;
         player2Win = false;
@@ -347,13 +357,13 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
 
         //sets player boosts to run for approx 50 frames from when boost button is hit
-        if (boost1Hit > this.frames) {
+        if (boost2Hit > this.frames) {
             player2.boost(boostSpeedSettings);
         } else {
             player2.boostStop(speedSetting);
             boostSound1.stop();
         }
-        if (boost2Hit > this.frames) {
+        if (boost1Hit > this.frames) {
             player1.boost(boostSpeedSettings);
         } else {
             player1.boostStop(speedSetting);
@@ -394,28 +404,80 @@ class Game extends JPanel implements KeyListener, ActionListener{
     public void keyPressed(KeyEvent k){
         int keyCode = k.getKeyCode();
         if (keyCode == KeyEvent.VK_A){
-            player1.turnLeft();
+            if (player1.isDirectionalTurning()){
+                player1.directionalTurn(270);
+            }
+            else {
+                player1.turnLeft();
+            }
         }
         else if (keyCode == KeyEvent.VK_D){
-            player1.turnRight();
+            if (player1.isDirectionalTurning()){
+                player1.directionalTurn(90);
+            }
+            else {
+                player1.turnRight();
+            }
         }
         else if (keyCode == KeyEvent.VK_LEFT){
-            player2.turnLeft();
+            if (player2.isDirectionalTurning()){
+                player2.directionalTurn(270);
+            }
+            else {
+                player2.turnLeft();
+            }
         }
         else if (keyCode == KeyEvent.VK_RIGHT){
-            player2.turnRight();
+            if (player2.isDirectionalTurning()){
+                player2.directionalTurn(90);
+            }
+            else {
+                player2.turnRight();
+            }
         }
         if (keyCode == KeyEvent.VK_UP) {
-            if (player1.getBoostsLeft() > 0 && !player1Win && !player2Win &&gameStarted){
-                boostSound1.play();
+            if (player2.isDirectionalTurning()){
+                player2.directionalTurn(0);
             }
-            boost1Hit = this.frames + BOOSTTIME;
+            else {
+                if (player2.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
+                    boostSound1.play();
+                }
+                boost2Hit = this.frames + BOOSTTIME;
+            }
         }
         if (keyCode == KeyEvent.VK_W){
-            if (player2.getBoostsLeft() > 0 && !player1Win && !player2Win &&gameStarted){
-                boostSound2.play();
+            if (player1.isDirectionalTurning()){
+                player1.directionalTurn(0);
             }
-            boost2Hit = this.frames + BOOSTTIME;
+            else {
+                if (player1.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
+                    boostSound2.play();
+                }
+                boost1Hit = this.frames + BOOSTTIME;
+            }
+        }
+        if (player2.isDirectionalTurning()) {
+            if (keyCode == KeyEvent.VK_DOWN) {
+                player2.directionalTurn(180);
+            }
+            if (keyCode == KeyEvent.VK_NUMPAD0){
+                if (player2.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
+                    boostSound1.play();
+                }
+                boost2Hit = this.frames + BOOSTTIME;
+            }
+        }
+        if (player1.isDirectionalTurning()) {
+            if (keyCode == KeyEvent.VK_S) {
+                player1.directionalTurn(180);
+            }
+            if (keyCode == KeyEvent.VK_F){
+                if (player1.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
+                    boostSound2.play();
+                }
+                boost1Hit = this.frames + BOOSTTIME;
+            }
         }
 
     }
@@ -431,12 +493,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
         //ALL OF THE SETTINGS BUTTONS
         if (keyCode == KeyEvent.VK_RIGHT) {
-            if (settings) {
+            if (settings && !singlePlayer) {
                 if (settingsSelection == 0) {
                     if (speedSetting < 10) {
                         speedSetting++;
                     }
-                    if (speedSetting > playersizeSetting){
+                    if (speedSetting > playersizeSetting) {
                         playersizeSetting = speedSetting;
                     }
                 }
@@ -453,81 +515,106 @@ class Game extends JPanel implements KeyListener, ActionListener{
                         boostSpeedSettings++;
                     }
                 }
-                if (settingsSelection == 4){
-                    if (playTill < 10){
+                if (settingsSelection == 4) {
+                    if (playTill < 10) {
                         playTill++;
                     }
                 }
-                if (settingsSelection == 5){
+                if (settingsSelection == 5) {
                     chooseColor();
+                }
+                if (settingsSelection == 6) {
+                    player1.setDirectionalTurning();
+                }
+                if (settingsSelection == 7) {
+                    player2.setDirectionalTurning();
                 }
                 settings();
             }
         }
 
-            if (keyCode == KeyEvent.VK_LEFT) {
-                if (settings) {
-                    if (settingsSelection == 0) {
-                        if (speedSetting > 2) {
-                            speedSetting--;
-                        }
+        if (keyCode == KeyEvent.VK_LEFT) {
+            if (settings && !singlePlayer) {
+                if (settingsSelection == 0) {
+                    if (speedSetting > 2) {
+                        speedSetting--;
                     }
-                    if (settingsSelection == 1) {
-                        if (playersizeSetting > 4) {
-                            playersizeSetting--;
-                        }
-                        if (playersizeSetting < speedSetting){
-                            speedSetting = playersizeSetting;
-                        }
-                    }
-                    if (settingsSelection == 2) {
-                        if (boostNumberSettings > 0) {
-                            boostNumberSettings--;
-                        }
-                    }
-                    if (settingsSelection == 3) {
-                        if (boostSpeedSettings > 3) {
-                            boostSpeedSettings--;
-                        }
-                    }
-                    if (settingsSelection == 4){
-                        if (playTill > 3) {
-                            playTill--;
-                        }
-                    }
-                    settings();
                 }
-            }
-            if (keyCode == KeyEvent.VK_DOWN) {
-                if (settings) {
-                    settingsSelection++;
-                    settingsSelection = settingsSelection % 6;
-                    settings();
+                if (settingsSelection == 1) {
+                    if (playersizeSetting > 4) {
+                        playersizeSetting--;
+                    }
+                    if (playersizeSetting < speedSetting) {
+                        speedSetting = playersizeSetting;
+                    }
                 }
+                if (settingsSelection == 2) {
+                    if (boostNumberSettings > 0) {
+                        boostNumberSettings--;
+                    }
+                }
+                if (settingsSelection == 3) {
+                    if (boostSpeedSettings > 3) {
+                        boostSpeedSettings--;
+                    }
+                }
+                if (settingsSelection == 4) {
+                    if (playTill > 3) {
+                        playTill--;
+                    }
+                }
+                settings();
             }
+        }
+        if (keyCode == KeyEvent.VK_DOWN) {
+            if (settings) {
+                settingsSelection++;
+                if (singlePlayer){
+                    settingsSelection = settingsSelection % 2;
+                }
+                else {
+                    settingsSelection = settingsSelection % 8;
+                }
+                settings();
+            }
+        }
 
-            //have to put these here so boost method runs before decrement of boostsLeft
-            if (keyCode == KeyEvent.VK_UP) {
-                if (settings) {
-                    settingsSelection--;
-                    if (settingsSelection < 0) {
-                        settingsSelection = 5;
+        //have to put these here so boost method runs before decrement of boostsLeft
+        if (keyCode == KeyEvent.VK_UP) {
+            if (settings) {
+                settingsSelection--;
+                if (settingsSelection < 0) {
+                    if (singlePlayer){
+                        settingsSelection = 1;
                     }
-                    settings();
+                    else {
+                        settingsSelection = 7;
+                    }
                 }
-                else{
-                    if (player2.getBoostsLeft() > 0) {
-                        player2.setBoostsLeft(player2.getBoostsLeft() - 1);
-                    }
+                settings();
+            } else if (!player2.isDirectionalTurning()) {
+                if (player2.getBoostsLeft() > 0) {
+                    player2.setBoostsLeft(player2.getBoostsLeft() - 1);
                 }
             }
-            //END OF SETTINGS BUTTONS
+        }
+        //END OF SETTINGS BUTTONS
+        if (keyCode == KeyEvent.VK_NUMPAD0 && player2.isDirectionalTurning()) {
+            if (player2.getBoostsLeft() > 0) {
+                player2.setBoostsLeft(player2.getBoostsLeft() - 1);
+            }
+        }
 
-            if (keyCode == KeyEvent.VK_W) {
-                if (player1.getBoostsLeft() > 0) {
-                    player1.setBoostsLeft(player1.getBoostsLeft() - 1);
-                }
+        if (keyCode == KeyEvent.VK_W && !player1.isDirectionalTurning()) {
+            if (player1.getBoostsLeft() > 0) {
+                player1.setBoostsLeft(player1.getBoostsLeft() - 1);
             }
+        }
+        if (keyCode == KeyEvent.VK_F && player1.isDirectionalTurning()) {
+            if (player1.getBoostsLeft() > 0) {
+                player1.setBoostsLeft(player1.getBoostsLeft() - 1);
+            }
+        }
             if (keyCode == KeyEvent.VK_S) {
                 if (!gameStarted || player1Win || player2Win) {
                     settings();
@@ -547,10 +634,12 @@ class Game extends JPanel implements KeyListener, ActionListener{
                     dt.start();
                     roundStart();
                 }
-            } else if (keyCode == KeyEvent.VK_ESCAPE) {
+            }
+            else if (keyCode == KeyEvent.VK_ESCAPE) {
                 System.exit(0);
             }
-        }
+
+    }
 
     public void keyTyped(KeyEvent k){}
 }
