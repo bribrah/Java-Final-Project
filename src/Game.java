@@ -28,6 +28,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
     private boolean player2Win;
     private boolean gameWon;
     private static Image splashScreen;
+    private static Image controlsMenu;
     private boolean gameStarted = false;
     public boolean settings = false;
     static boolean singlePlayer = false;
@@ -96,27 +97,27 @@ class Game extends JPanel implements KeyListener, ActionListener{
      * player 2 color depending on what users choose. These variables are then used
      * later to set colors of multiple graphics.
      */
-    public void chooseColor(){
+    public void chooseColor() {
         player1Picked = false;
         final JFrame colorChooserWindow = new JFrame();
         JPanel chooserContainer = new JPanel();
         final JColorChooser colorChooser = new JColorChooser(Color.red);
-        colorChooserWindow.setBounds(0,0,650,450);
+        colorChooserWindow.setBounds(0, 0, 650, 450);
 
-        final JLabel banner = new JLabel("Player 1 Choose Color",SwingConstants.CENTER);
-        banner.setFont(new Font("Cambria",Font.BOLD, 30));
+        final JLabel banner = new JLabel("Player 1 Choose Color", SwingConstants.CENTER);
+        banner.setFont(new Font("Cambria", Font.BOLD, 30));
         chooserContainer.add(banner);
         chooserContainer.add(colorChooser);
         JButton next = new JButton("Next");
+        //clicking gui listener req
         next.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (!player1Picked){
+                if (!player1Picked) {
                     player1Color = colorChooser.getColor();
                     banner.setText("Player 2 Choose Color");
                     colorChooser.setColor(player2Color);
-                    player1Picked =true;
-                }
-                else {
+                    player1Picked = true;
+                } else {
                     player2Color = colorChooser.getColor();
                     colorChooserWindow.setVisible(false);
                 }
@@ -134,6 +135,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
      * It has current settings and can be changed
      * renders a ball to indicate what setting sis currently selected
      */
+    //settings menu req
     public void settings(){
         doubleBuffer = createImage(getWidth(),getHeight());
         doubleBufferGraphics = doubleBuffer.getGraphics();
@@ -357,13 +359,13 @@ class Game extends JPanel implements KeyListener, ActionListener{
 
 
         //sets player boosts to run for approx 50 frames from when boost button is hit
-        if (boost2Hit > this.frames) {
+        if (boost2Hit > frames) {
             player2.boost(boostSpeedSettings);
         } else {
             player2.boostStop(speedSetting);
             boostSound1.stop();
         }
-        if (boost1Hit > this.frames) {
+        if (boost1Hit > frames) {
             player1.boost(boostSpeedSettings);
         } else {
             player1.boostStop(speedSetting);
@@ -443,7 +445,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
                 if (player2.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
                     boostSound1.play();
                 }
-                boost2Hit = this.frames + BOOSTTIME;
+                boost2Hit = frames + BOOSTTIME;
             }
         }
         if (keyCode == KeyEvent.VK_W){
@@ -454,7 +456,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
                 if (player1.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
                     boostSound2.play();
                 }
-                boost1Hit = this.frames + BOOSTTIME;
+                boost1Hit = frames + BOOSTTIME;
             }
         }
         if (player2.isDirectionalTurning()) {
@@ -465,7 +467,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
                 if (player2.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
                     boostSound1.play();
                 }
-                boost2Hit = this.frames + BOOSTTIME;
+                boost2Hit = frames + BOOSTTIME;
             }
         }
         if (player1.isDirectionalTurning()) {
@@ -476,7 +478,7 @@ class Game extends JPanel implements KeyListener, ActionListener{
                 if (player1.getBoostsLeft() > 0 && !player1Win && !player2Win && gameStarted) {
                     boostSound2.play();
                 }
-                boost1Hit = this.frames + BOOSTTIME;
+                boost1Hit = frames + BOOSTTIME;
             }
         }
 

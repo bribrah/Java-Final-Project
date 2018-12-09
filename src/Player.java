@@ -12,7 +12,6 @@ class Player {
     private int direction;
     private Color color;
     private int sideLength;
-    //how fast the car is moving (used for boost)
     private int speed;
     private int boostsLeft;
     private int score = 0;

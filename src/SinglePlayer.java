@@ -10,6 +10,7 @@ import java.io.IOException;
  * created by Brian Espinosa
  * Single player version of game
  * inherits many of the methods from the multiplayer version of the game
+ * new methods are mostly concerned with drawing of the levels
  */
 public class SinglePlayer extends Game {
 
@@ -34,6 +35,7 @@ public class SinglePlayer extends Game {
     private static Image level3;
     private static Image level4;
 
+    //satisfies array portion of reqs
     private int[] level1PointCoords = new int[]{200, 200, WINDOWWIDTH - 100, 300, 500, 500};
     private int[] level2PointCoords = new int[]{550, 234, 47, 57, 896, 610};
     private int[] level3PointCoords = new int[]{535, 358, 412, 383, 38, 365, 470, 113, 354, 653};
@@ -200,6 +202,8 @@ public class SinglePlayer extends Game {
      */
     public void levelDraw(Graphics2D g, int[] pointArray) {
         pointsOnLevel = pointArray.length / 2;
+
+        //satisfies loop portion of reqs
         for (int i = 0; i < pointArray.length; i += 2) {
             g.setColor(Color.blue);
             g.fillRect(pointArray[i], pointArray[i + 1], 15, 15);
@@ -229,6 +233,9 @@ public class SinglePlayer extends Game {
                 doubleBufferGraphics.setFont(new Font("Cambria", Font.BOLD, 60));
                 doubleBufferGraphics.setColor(Color.blue);
                 doubleBufferGraphics.drawString("You Lose! :(", 300, WINDOWHEIGHT / 2 - 60);
+                doubleBufferGraphics.setFont(new Font("Cambria", Font.PLAIN, 45));
+                doubleBufferGraphics.setColor(Color.green);
+                doubleBufferGraphics.drawString("Press S to Change Settings!", 250, WINDOWHEIGHT - 100);
                 gameStarted = false;
             }
             dt.stop();

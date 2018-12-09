@@ -15,7 +15,7 @@ public class RunGame
      * adds Game to gameWindow
      * initializes game by calling game.init();
      */
-public static void main(String[] args) throws InterruptedException {
+public static void main(String[] args) {
 
     final JFrame singleOrMultiplayer = new JFrame("Single or Multipler Choice");
     singleOrMultiplayer.setBounds(0,0,500,200);
